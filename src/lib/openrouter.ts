@@ -1,6 +1,7 @@
 import type { AppSettings } from "./types";
 
 const TOKEN_LOG_KEY = "driver-report:openrouter-tokens";
+const RR_INDEX_KEY = "driver-report:openrouter-rr-index";
 
 export interface TokenUsage {
   prompt_tokens: number;
@@ -41,16 +42,40 @@ export function totalTokensUsed(): number {
   return loadTokenLog().reduce((s, e) => s + e.total_tokens, 0);
 }
 
+/** Returns all configured API keys (multi-key list takes priority over single key). */
+function allApiKeys(s: AppSettings): string[] {
+  const multi = (s.openRouterApiKeys ?? []).filter(Boolean);
+  if (multi.length) return multi;
+  if (s.openRouterApiKey) return [s.openRouterApiKey];
+  return [];
+}
+
+/** Picks the next key using round-robin and advances the index. */
+function nextApiKey(keys: string[]): string {
+  if (keys.length === 1) return keys[0];
+  let idx = 0;
+  try {
+    idx = parseInt(window.localStorage.getItem(RR_INDEX_KEY) || "0", 10) || 0;
+  } catch { /* ignore */ }
+  const key = keys[idx % keys.length];
+  try {
+    window.localStorage.setItem(RR_INDEX_KEY, String((idx + 1) % keys.length));
+  } catch { /* ignore */ }
+  return key;
+}
+
 export async function extractPlateNumber(
   imageDataUrl: string,
   s: AppSettings,
 ): Promise<{ plate: string; usage: TokenUsage | null }> {
-  if (!s.openRouterApiKey) throw new Error("חסר מפתח OpenRouter בהגדרות");
+  const keys = allApiKeys(s);
+  if (!keys.length) throw new Error("חסר מפתח OpenRouter בהגדרות");
+  const apiKey = nextApiKey(keys);
   const res = await fetch(`${s.openRouterBaseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${s.openRouterApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: s.openRouterModel,

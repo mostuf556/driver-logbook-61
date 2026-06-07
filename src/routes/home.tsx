@@ -70,10 +70,15 @@ function HomePage() {
         toast.error("לא נמצאו רשומות בקובץ");
         return;
       }
-      const existingIds = new Set(reports.map((r) => r.id));
-      const newRecords = imported.filter((r) => !existingIds.has(r.id));
+      const existingKeys = new Set(reports.map((r) => `${r.date}|${r.carNumber}|${r.entryTime}`));
+      const newRecords = imported.filter((r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`));
+      const skipped = imported.length - newRecords.length;
       updateReports([...newRecords, ...reports]);
-      toast.success(`יובאו ${imported.length} רשומות מ-CSV`);
+      if (skipped > 0) {
+        toast.success(`יובאו ${newRecords.length} רשומות (${skipped} כפולות דולגו)`);
+      } else {
+        toast.success(`יובאו ${newRecords.length} רשומות מ-CSV`);
+      }
     } catch {
       toast.error("שגיאה בייבוא CSV");
     }

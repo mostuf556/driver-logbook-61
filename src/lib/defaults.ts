@@ -80,6 +80,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   csvIncludeOpenEntries: false,
 
   openRouterApiKey: "",
+  openRouterApiKeys: [],
   openRouterBaseUrl: "https://openrouter.ai/api/v1",
   openRouterModel: "google/gemini-2.5-flash",
   ocrPrompt: "Extract only the license plate number from this image. Return only the plate digits/characters, no other text.",

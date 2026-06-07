@@ -1,4 +1,4 @@
-import { Camera, ImagePlus, Loader2 } from "lucide-react";
+import { Camera, ImagePlus, Loader as Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,11 @@ import type { AppSettings } from "@/lib/types";
 export function PlateOcrDialog({
   settings,
   onConfirm,
+  onNavigateToSettings,
 }: {
   settings: AppSettings;
   onConfirm: (plate: string) => void;
+  onNavigateToSettings?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [image, setImage] = useState<string | null>(null);
@@ -54,8 +56,12 @@ export function PlateOcrDialog({
   };
 
   const openDialog = () => {
-    if (!settings.openRouterApiKey) {
-      toast.error("הוסף מפתח OpenRouter בהגדרות");
+    if (!settings.openRouterApiKey && !(settings.openRouterApiKeys?.length)) {
+      toast.error("הוסף מפתח OpenRouter בהגדרות", {
+        action: onNavigateToSettings
+          ? { label: "פתח הגדרות", onClick: onNavigateToSettings }
+          : undefined,
+      });
       return;
     }
     setOpen(true);
