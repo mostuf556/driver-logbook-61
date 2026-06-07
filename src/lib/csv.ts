@@ -6,8 +6,10 @@ function cellValue(r: DriverReport, key: CsvColumnKey, s: AppSettings): string {
   switch (key) {
     case "date":
       return formatDate(r.date, s.dateFormat);
-    case "driverName":
-      return r.driverName;
+    case "firstName":
+      return r.firstName;
+    case "lastName":
+      return r.lastName;
     case "idNumber":
       return r.idNumber;
     case "phone":
@@ -27,6 +29,7 @@ function cellValue(r: DriverReport, key: CsvColumnKey, s: AppSettings): string {
     case "guardName":
       return r.guardName;
   }
+  return "";
 }
 
 function escapeCell(v: string, delim: string): string {
@@ -86,19 +89,27 @@ export function exportAllReports(reports: DriverReport[], s: AppSettings) {
 }
 
 export function exportContactsCsv(
-  contacts: { driverName: string; idNumber: string; phone: string; company: string }[],
-  delim: string = ",",
-  includeBom = true,
+  contacts: { firstName: string; lastName: string; idNumber: string; phone: string; company: string }[],
+  s: AppSettings,
 ) {
-  const header = ["שם הנהג", "תעודת זהות", "טלפון", "חברה"];
+  const delim = s.csvDelimiter;
+  const includeBom = s.csvIncludeBom;
+  const header = ["שם פרטי", "שם משפחה", "תעודת זהות", "טלפון", "חברה"];
   const lines = [header.map((h) => escapeCell(h, delim)).join(delim)];
   for (const c of contacts) {
     lines.push(
-      [c.driverName, c.idNumber, c.phone ? `="${c.phone}"` : "", c.company]
+      [
+        c.firstName,
+        c.lastName,
+        c.idNumber,
+        s.csvQuotePhone && c.phone ? `="${c.phone}"` : c.phone,
+        c.company,
+      ]
         .map((v) => escapeCell(v, delim))
         .join(delim),
     );
   }
   const csv = (includeBom ? "\uFEFF" : "") + lines.join("\r\n");
-  downloadCsv("contact_list", csv);
+  const name = filenameDate(s.contactsFilenamePattern || "contact_list_dd_mm_yyyy", todayISO());
+  downloadCsv(name, csv);
 }

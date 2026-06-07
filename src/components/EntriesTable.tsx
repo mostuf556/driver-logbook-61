@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   Table,
   TableBody,
@@ -49,8 +50,8 @@ export function EntriesTable({
   };
 
   const onDelete = (r: DriverReport) => {
-    if (!confirm("למחוק רשומה זו?")) return;
     updateReports(reports.filter((x) => x.id !== r.id));
+    toast.success("נמחק");
   };
 
   if (!rows.length) {
@@ -58,14 +59,14 @@ export function EntriesTable({
   }
 
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="rounded-lg border bg-card" dir="rtl">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>תאריך</TableHead>
-            <TableHead>שם הנהג</TableHead>
+            <TableHead>שם נהג</TableHead>
             <TableHead>חברה</TableHead>
-            <TableHead>רכב</TableHead>
+            <TableHead>מספר רכב</TableHead>
             <TableHead>כניסה</TableHead>
             <TableHead>יציאה</TableHead>
             <TableHead>סהכ זמן</TableHead>
@@ -76,15 +77,16 @@ export function EntriesTable({
           {rows.map((r) => {
             const total = computeTotalMinutes(r.entryTime, r.exitTime, settings.allowOvernight);
             const live = !r.exitTime ? liveOnSiteMinutes(r.date, r.entryTime) : 0;
+            const fullName = [r.firstName, r.lastName].filter(Boolean).join(" ");
             return (
-              <TableRow key={r.id} className={!r.exitTime ? "bg-amber-50/60" : ""}>
+              <TableRow key={r.id} className={!r.exitTime ? "bg-accent/40" : ""}>
                 <TableCell>{formatDate(r.date, settings.dateFormat)}</TableCell>
                 <TableCell className="font-medium">
-                  {r.driverName}
+                  {fullName}
                   <div className="text-xs text-muted-foreground">{r.idNumber}</div>
                 </TableCell>
                 <TableCell>{r.company}</TableCell>
-                <TableCell className="font-mono">{r.carNumber}</TableCell>
+                <TableCell className="font-mono" dir="ltr">{r.carNumber}</TableCell>
                 <TableCell>{r.entryTime}</TableCell>
                 <TableCell>
                   {r.exitTime ?? (
@@ -100,7 +102,7 @@ export function EntriesTable({
                   <div className="flex justify-end gap-1">
                     {showLeave && !r.exitTime && (
                       <Button size="sm" onClick={() => onLeave(r)}>
-                        יציאה
+                        יצא
                       </Button>
                     )}
                     <Button asChild size="icon" variant="ghost">
@@ -108,9 +110,16 @@ export function EntriesTable({
                         <Pencil />
                       </Link>
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => onDelete(r)}>
-                      <Trash2 />
-                    </Button>
+                    <ConfirmDialog
+                      title="למחוק רשומה זו?"
+                      description={`${fullName || ""} · ${r.carNumber}`}
+                      onConfirm={() => onDelete(r)}
+                      trigger={
+                        <Button size="icon" variant="ghost">
+                          <Trash2 />
+                        </Button>
+                      }
+                    />
                   </div>
                 </TableCell>
               </TableRow>

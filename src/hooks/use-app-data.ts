@@ -8,6 +8,7 @@ import {
   saveReports,
   saveSettings,
 } from "@/lib/storage";
+import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import type { AppSettings, Contact, DriverReport } from "@/lib/types";
 
 let listeners = new Set<() => void>();
@@ -16,13 +17,23 @@ function notify() {
 }
 
 export function useAppData() {
-  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
-  const [reports, setReports] = useState<DriverReport[]>(() => loadReports());
-  const [contacts, setContacts] = useState<Contact[]>(() => loadContacts());
+  // SSR-safe: start with defaults, hydrate from localStorage after mount.
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [reports, setReports] = useState<DriverReport[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    purgeOldData(loadSettings());
-    setReports(loadReports());
+    try {
+      const s = loadSettings();
+      purgeOldData(s);
+      setSettings(s);
+      setReports(loadReports());
+      setContacts(loadContacts());
+    } catch (e) {
+      console.error("useAppData hydrate failed", e);
+    }
+    setHydrated(true);
     const handler = () => {
       setSettings(loadSettings());
       setReports(loadReports());
@@ -47,5 +58,5 @@ export function useAppData() {
     notify();
   }, []);
 
-  return { settings, reports, contacts, updateSettings, updateReports, updateContacts };
+  return { settings, reports, contacts, hydrated, updateSettings, updateReports, updateContacts };
 }

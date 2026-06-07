@@ -25,14 +25,16 @@ import { clearAll, exportAllJson, importAllJson } from "@/lib/storage";
 import type { AppSettings, AutocompleteField } from "@/lib/types";
 
 const AUTOCOMPLETE_FIELD_OPTIONS: { key: AutocompleteField; label: string }[] = [
-  { key: "driverName", label: "שם הנהג" },
+  { key: "firstName", label: "שם פרטי" },
+  { key: "lastName", label: "שם משפחה" },
   { key: "idNumber", label: "ת.ז." },
   { key: "phone", label: "טלפון" },
   { key: "company", label: "חברה" },
 ];
 
 const CONTACT_FIELD_OPTIONS = [
-  { key: "driverName" as const, label: "שם הנהג" },
+  { key: "firstName" as const, label: "שם פרטי" },
+  { key: "lastName" as const, label: "שם משפחה" },
   { key: "idNumber" as const, label: "ת.ז." },
   { key: "phone" as const, label: "טלפון" },
   { key: "company" as const, label: "חברה" },
@@ -102,6 +104,22 @@ export function SettingsForm() {
                 </SelectContent>
               </Select>
             </Field>
+            <Field label="ערכת נושא">
+              <Select value={s.theme} onValueChange={(v) => set("theme", v as AppSettings["theme"])}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">בהיר</SelectItem>
+                  <SelectItem value="dark">כהה</SelectItem>
+                  <SelectItem value="blue">כחול</SelectItem>
+                  <SelectItem value="system">מערכת</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Toggle
+              label="הצג כפתור דיבאג בכותרת"
+              checked={s.showDebugToggle}
+              onCheckedChange={(v) => set("showDebugToggle", v)}
+            />
           </AccordionContent>
         </AccordionItem>
 
@@ -250,6 +268,9 @@ export function SettingsForm() {
           <AccordionContent className="grid gap-4 sm:grid-cols-2">
             <Field label="תבנית שם קובץ">
               <Input value={s.csvFilenamePattern} onChange={(e) => set("csvFilenamePattern", e.target.value)} />
+            </Field>
+            <Field label="תבנית שם קובץ אנשי קשר">
+              <Input value={s.contactsFilenamePattern} onChange={(e) => set("contactsFilenamePattern", e.target.value)} />
             </Field>
             <Field label="מפריד">
               <Select value={s.csvDelimiter} onValueChange={(v) => set("csvDelimiter", v as "," | ";" | "\t")}>

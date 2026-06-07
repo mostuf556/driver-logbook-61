@@ -1,7 +1,8 @@
 export interface DriverReport {
   id: string;
   date: string; // YYYY-MM-DD
-  driverName: string;
+  firstName: string;
+  lastName: string;
   idNumber: string;
   phone: string;
   carNumber: string;
@@ -16,7 +17,8 @@ export interface DriverReport {
 
 export interface Contact {
   id: string;
-  driverName: string;
+  firstName: string;
+  lastName: string;
   idNumber: string;
   phone: string;
   company: string;
@@ -30,7 +32,8 @@ export interface PendingImage {
 }
 
 export type AutocompleteField =
-  | "driverName"
+  | "firstName"
+  | "lastName"
   | "idNumber"
   | "phone"
   | "company"
@@ -40,7 +43,8 @@ export type AutocompleteField =
 
 export type CsvColumnKey =
   | "date"
-  | "driverName"
+  | "firstName"
+  | "lastName"
   | "idNumber"
   | "phone"
   | "carNumber"
@@ -60,6 +64,7 @@ export interface CsvColumn {
 export interface AppSettings {
   // General
   direction: "rtl" | "ltr";
+  theme: "light" | "dark" | "blue" | "system";
   dateFormat: "dd/mm/yyyy" | "yyyy-mm-dd" | "dd.mm.yyyy";
   timeFormat: "HH:mm" | "h:mm a";
 
@@ -106,8 +111,9 @@ export interface AppSettings {
   // Contacts
   autoUpdateContactsOnSave: boolean;
   contactUpsertKey: "idNumber" | "phone" | "name+company";
-  contactFields: ("driverName" | "idNumber" | "phone" | "company")[];
+  contactFields: ("firstName" | "lastName" | "idNumber" | "phone" | "company")[];
   confirmBeforeContactOverwrite: boolean;
+  contactsFilenamePattern: string;
 
   // CSV
   csvFilenamePattern: string;
@@ -128,4 +134,7 @@ export interface AppSettings {
 
   // Storage
   storageNamespace: string;
+
+  // Debug
+  showDebugToggle: boolean;
 }
