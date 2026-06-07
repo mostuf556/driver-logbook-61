@@ -80,3 +80,13 @@ src/
 - **Print / PDF export** — formatted daily report for physical sign-off
 - **LDAP / Active Directory integration** — auto-lookup driver details from corporate directory
 - **Two-way SMS** — send driver an entry confirmation / exit reminder via Twilio or similar
+
+-----------------------------------
+
+## TODOs:
+
+- UI Bug: The table body cells do not properly align with the corresponding header columns.
+- Data Ingestion: Modify the CSV import logic to detect and automatically skip duplicate records.
+- Documentation: Refresh the README file to include an overview of application features and a roadmap for future development.
+- Navigation: Upgrade error notifications to be clickable. Triggering the notification should route the user to the exact page, section, or input field requiring - attention (e.g., redirecting to the settings page for a missing OpenRouter key).
+- API Management: Allow users to configure multiple OpenRouter API keys and implement a round-robin strategy to distribute requests between them.
