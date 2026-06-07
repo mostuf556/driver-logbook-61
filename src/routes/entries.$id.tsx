@@ -16,7 +16,7 @@ function EditEntryPage() {
   const r = reports.find((x) => x.id === id);
 
   useEffect(() => {
-    if (reports.length && !r) navigate({ to: "/" });
+    if (reports.length && !r) navigate({ to: "/home" });
   }, [r, reports.length, navigate]);
 
   return (

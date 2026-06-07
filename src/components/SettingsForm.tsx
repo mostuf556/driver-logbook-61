@@ -104,6 +104,22 @@ export function SettingsForm() {
                 </SelectContent>
               </Select>
             </Field>
+            <Field label="ערכת נושא">
+              <Select value={s.theme} onValueChange={(v) => set("theme", v as AppSettings["theme"])}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">בהיר</SelectItem>
+                  <SelectItem value="dark">כהה</SelectItem>
+                  <SelectItem value="blue">כחול</SelectItem>
+                  <SelectItem value="system">מערכת</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Toggle
+              label="הצג כפתור דיבאג בכותרת"
+              checked={s.showDebugToggle}
+              onCheckedChange={(v) => set("showDebugToggle", v)}
+            />
           </AccordionContent>
         </AccordionItem>
 
@@ -252,6 +268,9 @@ export function SettingsForm() {
           <AccordionContent className="grid gap-4 sm:grid-cols-2">
             <Field label="תבנית שם קובץ">
               <Input value={s.csvFilenamePattern} onChange={(e) => set("csvFilenamePattern", e.target.value)} />
+            </Field>
+            <Field label="תבנית שם קובץ אנשי קשר">
+              <Input value={s.contactsFilenamePattern} onChange={(e) => set("contactsFilenamePattern", e.target.value)} />
             </Field>
             <Field label="מפריד">
               <Select value={s.csvDelimiter} onValueChange={(v) => set("csvDelimiter", v as "," | ";" | "\t")}>
