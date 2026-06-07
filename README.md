@@ -85,3 +85,13 @@ src/
 - **Print / PDF export** — formatted daily report for physical sign-off
 - **LDAP / Active Directory integration** — auto-lookup driver details from corporate directory
 - **Two-way SMS** — send driver an entry confirmation / exit reminder via Twilio or similar
+
+
+## Todos
+
+
+- regex validation update: allow using char: "-" on fields: phone number, car licenses
+- form: all fields should be aligned to the right if RTL language mode is activated (also phone number)
+- a contact may have multiple car licenses
+- a contact should contain a car license option
+- add link to github issues in order to easily report bugs
