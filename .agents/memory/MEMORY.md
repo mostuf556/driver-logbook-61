@@ -1,0 +1,2 @@
+- [Expo 53 + RN 0.79 metro fix](expo-metro-fix.md) — metro 0.84.x from old RN 0.85 install breaks expo 53; must run `npx expo install metro` to get 0.82.x
+- [Expo version pinning](expo-version-pinning.md) — always use `npx expo install --fix` after any npm install to sync all packages to expo-compatible versions
