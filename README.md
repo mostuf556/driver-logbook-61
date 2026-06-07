@@ -85,6 +85,7 @@ src/
 
 ## TODOs:
 
+- Data Validation on CSV input: Import .csv on /contacts page allows duplicated records
 - UI Bug: The table body cells do not properly align with the corresponding header columns.
 - Data Ingestion: Modify the CSV import logic to detect and automatically skip duplicate records.
 - Documentation: Refresh the README file to include an overview of application features and a roadmap for future development.
