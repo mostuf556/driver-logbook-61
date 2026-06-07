@@ -1,137 +1,83 @@
-# Driver Report App — Plan (v3)
+# Plan v4 — fixes + UX/config additions
 
-Hebrew/RTL web app stored in browser localStorage. No backend. Log driver gate entries, manage contacts per company, export daily CSV. Optional OpenRouter image OCR for car plate numbers. **Anything tweakable lives in `/settings` so the user has full control without code changes.**
+## 1. Fix SSR error (item 3)
+- The app reads `localStorage` during render via `useAppData` — on SSR that throws and crashes the page.
+- Make `use-app-data.ts` SSR-safe: initialize state from defaults/empty and hydrate from `localStorage` inside a `useEffect`. Guard every `storage.ts` call with `typeof window !== "undefined"`.
+- Also add an `errorComponent` on `__root.tsx` so any future render error shows a readable fallback (item 1 partly).
 
-## Core Workflow (gate flow)
+## 2. Full error log viewer (item 1)
+- Add `src/lib/error-log.ts`: ring buffer (max 200) persisted to `localStorage` capturing `window.onerror`, `unhandledrejection`, and a `logError(err, ctx)` helper. Wired in `__root.tsx` on mount.
+- New page `/logs` (route file `logs.tsx`) showing a table: time / source / message / stack. Buttons: Clear, Copy JSON, Download.
+- Link to `/logs` from `AppLayout` nav.
+- Server-side: any SSR error already captured by `src/lib/error-capture.ts`; surface latest in `/logs` via a `createServerFn` that returns it.
 
-1. Driver arrives → **"כניסה חדשה"** → `date`+`entryTime` auto-filled with now. Record is **open** (no exitTime).
-2. Driver leaves → **"יציאה"** button on the open row sets `exitTime = now` and recomputes `סהכ זמן`.
-3. **"ערוך"** on any row for manual edits.
+## 3. Themes: light / dark / blue (item 2)
+- Add `theme` to settings: `"light" | "dark" | "blue" | "system"`.
+- Define `.dark` and `.theme-blue` CSS variable blocks in `src/styles.css` (existing tokens; just override `--background`, `--foreground`, `--primary`, etc.).
+- New `ThemeProvider` in `AppLayout` toggles `<html>` classes based on settings + system pref.
+- Small theme switcher (icon button) in header.
 
-Dashboard sections: Open entries (on-site) → Today's closed → History (collapsible, filterable).
+## 4. Split driver name (item 4)
+- `DriverReport`/`Contact` get `firstName`, `lastName` (drop `driverName`). Migration helper in `storage.ts` on load: split existing `driverName` by first space.
+- Update `EntryForm`, `ContactsManager`, autocomplete fields, CSV columns (default header "שם פרטי" / "שם משפחה"), settings labels.
 
-## Pages
+## 5. Quick exit by partial plate (item 5)
+- On `/` dashboard add a search input above Open Entries: "חפש לפי מספר רכב". Normalize input + record car numbers by stripping `-` and whitespace; substring match. Live-filter open entries; each match has a prominent "יצא" button that stamps `exitTime = now` and recalculates total.
 
-`/` dashboard · `/entries/new` · `/entries/$id` · `/contacts` · `/settings`
+## 6. Contacts page fixes (item 6)
+- Rebuild `ContactsManager` as a responsive table with full-width inline editing using a Dialog (or expandable row) so all fields are visible without truncation. Add column widths and `min-w-0` + `whitespace-nowrap` only where needed; inputs use `w-full`.
 
-## Full Config (`/settings`)
+## 7. Confirm before delete (item 7)
+- All delete actions (entries, contacts, logs) use shadcn `AlertDialog` with explicit confirm/cancel.
 
-All values stored in localStorage under `settings`. Reset-to-defaults button. Import/export settings as JSON.
+## 8. Car plate length ignoring `-` (item 8)
+- Default `carNumberMaxLength = 10`. Validator strips `-` before counting. Update settings label to "ללא ספירת מקפים".
 
-### General
-- `language` (he) — reserved for future
-- `direction` (rtl/ltr) — default rtl
-- `theme` (light/dark/system) — default light
-- `dateFormat` (`dd/mm/yyyy` | `yyyy-mm-dd` | `dd.mm.yyyy`)
-- `timeFormat` (`HH:mm` | `h:mm a`)
-- `timezone` (default: browser)
-- `weekStart` (sun/mon)
+## 9. Rename "דשבורד" → "דוח כניסות ויציאות" (item 9)
+- Update nav label and `/` page title.
 
-### Retention & cleanup
-- `retentionDays` (default 30) — purge closed reports older than this
-- `keepOpenEntriesForever` (true) — never auto-purge on-site records
-- `purgeOnAppLoad` (true)
-- `imageRetentionHours` (default 0 = delete immediately on confirm)
+## 10. Export/Import as icons on `/` (item 10)
+- Replace text buttons with icon buttons (`Download` / `Upload` from lucide-react) + tooltips.
 
-### Entry form defaults & behavior
-- `autoFillDate` (true), `autoFillEntryTime` (true)
-- `defaultCompany`, `defaultApprover` (שם המאשר), `defaultGuard` (שם השומר)
-- `requireApprover`, `requireGuard`, `requireCarNumber`, `requirePhone`, `requireIdNumber` (booleans)
-- `allowOvernight` (true) — if exit < entry, count as next-day
-- `roundTimesToMinutes` (1 | 5 | 15)
-- `liveOnSiteBadge` (true) — show running clock on open rows
+## 11. Field label "רכב" / "מספר רישוי" → unified "מספר רכב" (item 11)
+- Audit all forms/tables/CSV headers and use one consistent label "מספר רכב".
 
-### Validation
-- `phoneMinLength` (9), `phoneMaxLength` (10)
-- `phoneAllowedPrefixes` (e.g. `0,+972`)
-- `idNumberLength` (9), `validateIsraeliId` (true)
-- `carNumberMinLength` (5), `carNumberMaxLength` (8)
-- `carNumberAllowedChars` (regex, default digits+dash)
+## 12. RTL on Hebrew field names (item 12)
+- Add `dir="rtl"` to labels and table headers on `/`. Ensure inputs holding Latin/numeric content stay `dir="ltr"` so digits render correctly while their *label* is RTL.
 
-### Auto-complete (field-scoped)
-- `autocompleteEnabled` (true)
-- `autocompleteMinChars` (1)
-- `autocompleteMaxSuggestions` (8)
-- `autocompleteFields` — checklist of {driverName, idNumber, phone, company, carNumber, approverName, guardName} (each toggleable)
-- `autoFillOnSelect` (true) — selecting a suggestion fills sibling fields from same contact
-- `matchMode` (`prefix` | `substring`) per field
-- `caseSensitive` (false)
+## 13. Default route `/home` (item 13)
+- New `src/routes/home.tsx` containing what `/` had.
+- `src/routes/index.tsx` becomes a redirect to `/home` (`beforeLoad: () => redirect({ to: "/home" })`).
+- Update all nav links.
 
-### Contacts auto-update
-- `autoUpdateContactsOnSave` (true)
-- `contactUpsertKey` (`idNumber` | `phone` | `name+company`)
-- `contactFields` — checklist of which fields to persist to contacts (default: driverName, idNumber, phone, company; excludes date/times)
-- `confirmBeforeContactOverwrite` (false)
+## 14. Contacts export filename with date (item 14)
+- When exporting contacts CSV, filename = `contacts_dd_mm_yyyy.csv` (configurable pattern `contactsFilenamePattern`).
 
-### CSV export
-- `csvFilenamePattern` (default `driver_report_dd_mm_yyyy`)
-- `csvDelimiter` (`,` | `;` | `\t`)
-- `csvIncludeBom` (true) — UTF-8 BOM for Excel
-- `csvQuotePhone` (true) — preserve leading 0
-- `csvColumns` — ordered, toggleable list with Hebrew header overrides for each:
-  תאריך, שם הנהג, תעודת זהות, טלפון, מספר הרכב, שעת כניסה, שעת יציאה, סהכ זמן, שם המאשר, חברה, שם השומר
-- `csvDateFormat`, `csvTimeFormat` (mirror General or override)
-- `csvIncludeOpenEntries` (false)
-- `csvAllRangeDefault` (`today` | `last7` | `last30` | `all`)
+## 15. `#debug` URL → debug tools (item 15)
+- New `src/hooks/use-debug-mode.ts` reading `location.hash === "#debug"` OR settings flag.
+- When active, show button "צור נתוני דמו" on `/contacts` and `/entries/new`. Generates a realistic random record/contact (Hebrew names list, valid Israeli IDs via checksum, random phone with allowed prefix, plate, company).
 
-### OpenRouter OCR
-- `openRouterApiKey` (string, device-local — clear warning)
-- `openRouterBaseUrl` (`https://openrouter.ai/api/v1`)
-- `openRouterModel` (default `google/gemini-2.5-flash`)
-- `ocrPrompt` (editable system prompt, default: "Return only the license plate digits, no other text.")
-- `ocrAutoFillCarNumber` (true)
-- `ocrRequireConfirmation` (true)
-- `ocrMaxImageSizeMB` (5) — client-side downscale above this
-- `ocrAllowedMimeTypes` (jpeg, png, webp)
+## 16. Settings toggle to always show debug button (item 16)
+- New setting `showDebugToggle: boolean` (default false). When true, a small "Debug" toggle appears in the header alongside the theme switcher.
 
-### Storage
-- `storageNamespace` (default `driver-report`) — to run multiple instances per browser
-- Manual buttons: Export all data (JSON), Import (JSON), Clear all (with confirm).
+---
 
-## Data Model
+## Files to add
+- `src/routes/home.tsx`, `src/routes/logs.tsx`
+- `src/lib/error-log.ts`, `src/lib/theme.ts`, `src/lib/debug-data.ts`
+- `src/hooks/use-debug-mode.ts`, `src/hooks/use-theme.ts`
+- `src/components/ThemeSwitcher.tsx`, `src/components/ConfirmDialog.tsx`, `src/components/QuickExitSearch.tsx`
 
-`driver_reports[]`, `contacts[]`, `settings`, `pending_images[]`.
+## Files to edit
+- `src/routes/__root.tsx`, `src/routes/index.tsx`, `src/routes/contacts.tsx`, `src/routes/entries.new.tsx`, `src/routes/entries.$id.tsx`, `src/routes/settings.tsx`
+- `src/components/AppLayout.tsx`, `src/components/EntryForm.tsx`, `src/components/EntriesTable.tsx`, `src/components/ContactsManager.tsx`, `src/components/SettingsForm.tsx`, `src/components/FieldAutocomplete.tsx`
+- `src/hooks/use-app-data.ts`
+- `src/lib/types.ts`, `src/lib/defaults.ts`, `src/lib/storage.ts` (migrate), `src/lib/csv.ts`, `src/lib/contacts.ts`, `src/lib/validation.ts`
+- `src/styles.css` (theme tokens)
 
-```
-driver_report: { id, date, driverName, idNumber, phone, carNumber,
-  entryTime, exitTime|null, approverName, company, guardName,
-  createdAt, updatedAt }
-contact: { id, driverName, idNumber, phone, company }
-```
+## Out of scope
+- Server-side persistence of logs (kept in localStorage + last SSR error only).
+- i18n beyond Hebrew.
+- Multi-user / cloud sync.
 
-`סהכ זמן` is always computed at render time from `entryTime`/`exitTime` (+overnight rule).
-
-## Auto-complete behavior
-Per-field combobox (shadcn `command`). Matches **only same-field values from contacts**. Selecting fills siblings from that contact if `autoFillOnSelect`. No cross-field matching ever.
-
-## Retention
-On load (if `purgeOnAppLoad`): drop closed reports older than `today - retentionDays`. Open kept if `keepOpenEntriesForever`. Expire `pending_images` past `imageRetentionHours`.
-
-## OpenRouter flow
-Camera/file → base64 → POST to `${openRouterBaseUrl}/chat/completions` with `openRouterModel` + `ocrPrompt`. Show preview + editable extracted text. On confirm: write `carNumber`, then delete now or after `imageRetentionHours`.
-
-## UI / Design
-`<html lang="he" dir="rtl">`. Tailwind + shadcn (Card, Table, Dialog, Select, Command/Popover, Input, Form, Sonner). Light neutral palette, no purple. Mobile-first; table → card list on narrow screens. Settings page grouped by accordion sections matching the config groups above.
-
-## Technical
-
-Stack: existing TanStack Start, client-only.
-
-New files:
-- `src/lib/types.ts`, `src/lib/defaults.ts` (default settings)
-- `src/lib/storage.ts` (namespaced localStorage + purge)
-- `src/lib/settings.ts` (typed getter/setter, JSON import/export)
-- `src/lib/csv.ts` (configurable delimiter/columns/BOM/filename pattern)
-- `src/lib/time.ts`, `src/lib/format.ts` (date/time formatters)
-- `src/lib/validation.ts` (configurable phone/id/car validators, optional Israeli-ID check digit)
-- `src/lib/contacts.ts` (upsert by configured key, suggestion index)
-- `src/lib/openrouter.ts`
-- `src/components/FieldAutocomplete.tsx`, `EntryForm.tsx`, `EntriesTable.tsx`, `LeaveButton.tsx`, `PlateOcrDialog.tsx`, `ContactsManager.tsx`, `SettingsForm.tsx` (grouped accordion)
-- Routes: replace `src/routes/index.tsx`; add `entries.new.tsx`, `entries.$id.tsx`, `contacts.tsx`, `settings.tsx`
-
-No new deps.
-
-## Out of Scope (confirm if wanted)
-Multi-device sync · printing/PDF · server-side OCR proxy · multi-user auth.
-
-Approve and I'll build.
+Reply "approve" and I'll implement, or tell me what to change.
