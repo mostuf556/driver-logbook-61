@@ -84,8 +84,8 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
     <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2" dir="rtl">
       {debug && !isEdit && (
         <div className="sm:col-span-2">
-          <Button type="button" variant="outline" onClick={() => setForm(randomReport(settings))}>
-            צור נתוני דמו
+          <Button type="button" variant="outline" size="sm" onClick={() => setForm(randomReport(settings))}>
+            מלא נתוני דמו
           </Button>
         </div>
       )}

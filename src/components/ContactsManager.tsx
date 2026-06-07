@@ -101,24 +101,27 @@ export function ContactsManager() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {debug && (
-        <div>
-          <Button
-            variant="outline"
-            onClick={() => updateContacts([randomContact(), ...contacts])}
-          >
-            צור נתוני דמו
-          </Button>
-        </div>
-      )}
-
       <form onSubmit={add} className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="שם פרטי" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
         <Field label="שם משפחה" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
         <Field label="ת.ז." value={form.idNumber} onChange={(v) => setForm({ ...form, idNumber: v })} />
         <Field label="טלפון" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
         <Field label="חברה" value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
-        <div className="flex items-end">
+        <div className="flex items-end gap-2">
+          {debug && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+              onClick={() => {
+                const c = randomContact();
+                setForm({ ...c, id: "" });
+              }}
+            >
+              דמו
+            </Button>
+          )}
           <Button type="submit" className="w-full">הוסף איש קשר</Button>
         </div>
       </form>

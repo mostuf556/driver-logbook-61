@@ -38,7 +38,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <NavLink to="/logs">לוגים</NavLink>
             <NavLink to="/settings">הגדרות</NavLink>
 
-            {settings.showDebugToggle && (
+            {(settings.showDebugToggle || debug) && (
               <Button
                 variant={debug ? "default" : "ghost"}
                 size="icon"
