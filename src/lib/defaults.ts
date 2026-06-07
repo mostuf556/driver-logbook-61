@@ -2,10 +2,11 @@ import type { AppSettings, CsvColumn } from "./types";
 
 export const DEFAULT_CSV_COLUMNS: CsvColumn[] = [
   { key: "date", header: "תאריך", enabled: true },
-  { key: "driverName", header: "שם הנהג", enabled: true },
+  { key: "firstName", header: "שם פרטי", enabled: true },
+  { key: "lastName", header: "שם משפחה", enabled: true },
   { key: "idNumber", header: "תעודת זהות", enabled: true },
   { key: "phone", header: "טלפון", enabled: true },
-  { key: "carNumber", header: "מספר הרכב", enabled: true },
+  { key: "carNumber", header: "מספר רכב", enabled: true },
   { key: "entryTime", header: "שעת כניסה", enabled: true },
   { key: "exitTime", header: "שעת יציאה", enabled: true },
   { key: "totalTime", header: "סהכ זמן", enabled: true },
@@ -16,6 +17,7 @@ export const DEFAULT_CSV_COLUMNS: CsvColumn[] = [
 
 export const DEFAULT_SETTINGS: AppSettings = {
   direction: "rtl",
+  theme: "light",
   dateFormat: "dd/mm/yyyy",
   timeFormat: "HH:mm",
 
@@ -44,14 +46,15 @@ export const DEFAULT_SETTINGS: AppSettings = {
   idNumberLength: 9,
   validateIsraeliId: false,
   carNumberMinLength: 5,
-  carNumberMaxLength: 8,
+  carNumberMaxLength: 10,
   carNumberAllowedChars: "^[0-9-]+$",
 
   autocompleteEnabled: true,
   autocompleteMinChars: 1,
   autocompleteMaxSuggestions: 8,
   autocompleteFields: [
-    "driverName",
+    "firstName",
+    "lastName",
     "idNumber",
     "phone",
     "company",
@@ -65,8 +68,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
 
   autoUpdateContactsOnSave: true,
   contactUpsertKey: "idNumber",
-  contactFields: ["driverName", "idNumber", "phone", "company"],
+  contactFields: ["firstName", "lastName", "idNumber", "phone", "company"],
   confirmBeforeContactOverwrite: false,
+  contactsFilenamePattern: "contact_list_dd_mm_yyyy",
 
   csvFilenamePattern: "driver_report_dd_mm_yyyy",
   csvDelimiter: ",",
@@ -84,4 +88,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ocrMaxImageSizeMB: 5,
 
   storageNamespace: "driver-report",
+
+  showDebugToggle: false,
 };
