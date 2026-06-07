@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { useAppData } from "@/hooks/use-app-data";
 import { useDebugMode } from "@/hooks/use-debug-mode";
-import { exportContactsCsv } from "@/lib/csv";
+import { exportContactsCsv, parseCsvLine } from "@/lib/csv";
 import { randomContact } from "@/lib/debug-data";
 import { uid } from "@/lib/storage";
 import type { Contact } from "@/lib/types";
@@ -66,13 +66,14 @@ export function ContactsManager() {
     const lines = clean.split(/\r?\n/).filter(Boolean);
     if (!lines.length) return;
     const header = lines[0];
-    const start = /שם|name/i.test(header) ? 1 : 0;
-    const cols = header.split(/[,\t;]/).map((c) => c.trim().replace(/^"|"$/g, ""));
+    const delim = header.includes("\t") ? "\t" : header.includes(";") ? ";" : ",";
+    const cols = parseCsvLine(header, delim).map((c) => c.trim());
+    const start = cols.some((c) => /שם|name|id|phone|company/i.test(c)) ? 1 : 0;
     // legacy "שם הנהג" single-name column support
     const hasFull = cols.some((c) => /שם הנהג|driverName/i.test(c));
     const added: Contact[] = [];
     for (let i = start; i < lines.length; i++) {
-      const raw = lines[i].split(/[,\t;]/).map((c) => c.replace(/^="?|"?$/g, "").trim());
+      const raw = parseCsvLine(lines[i], delim);
       let firstName = "", lastName = "", idNumber = "", phone = "", company = "";
       if (hasFull) {
         const [name = "", id = "", ph = "", co = ""] = raw;

@@ -2,6 +2,41 @@ import { DEFAULT_CSV_COLUMNS } from "./defaults";
 import { computeTotalMinutes, filenameDate, formatDate, formatTotal, todayISO } from "./time";
 import type { AppSettings, CsvColumnKey, DriverReport } from "./types";
 
+/** Parse one CSV line respecting quoted fields and Excel ="value" formula syntax. */
+export function parseCsvLine(line: string, delim: string): string[] {
+  const fields: string[] = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; }
+        else inQuotes = false;
+      } else {
+        cur += ch;
+      }
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (line.startsWith(delim, i)) {
+      fields.push(unExcelQuote(cur));
+      cur = "";
+      i += delim.length - 1;
+    } else {
+      cur += ch;
+    }
+  }
+  fields.push(unExcelQuote(cur));
+  return fields;
+}
+
+/** Strip Excel ="value" formula wrapper if present. */
+function unExcelQuote(v: string): string {
+  const t = v.trim();
+  if (t.startsWith('="') && t.endsWith('"')) return t.slice(2, -1);
+  return t;
+}
+
 function cellValue(r: DriverReport, key: CsvColumnKey, s: AppSettings): string {
   switch (key) {
     case "date":
