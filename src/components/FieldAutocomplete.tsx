@@ -43,8 +43,10 @@ export function FieldAutocomplete({
 
   const labelFor = (c: Contact) => {
     switch (field) {
-      case "driverName":
-        return c.driverName;
+      case "firstName":
+        return c.firstName;
+      case "lastName":
+        return c.lastName;
       case "idNumber":
         return c.idNumber;
       case "phone":
@@ -96,7 +98,7 @@ export function FieldAutocomplete({
               >
                 <div className="font-medium">{labelFor(c)}</div>
                 <div className="text-xs text-muted-foreground">
-                  {[c.driverName, c.idNumber, c.company].filter(Boolean).join(" · ")}
+                  {[c.firstName, c.lastName, c.idNumber, c.company].filter(Boolean).join(" · ")}
                 </div>
               </button>
             </li>
