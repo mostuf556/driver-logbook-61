@@ -111,6 +111,8 @@ export function SettingsForm() {
                   <SelectItem value="light">בהיר</SelectItem>
                   <SelectItem value="dark">כהה</SelectItem>
                   <SelectItem value="blue">כחול</SelectItem>
+                  <SelectItem value="green">ירוק</SelectItem>
+                  <SelectItem value="warm">חם</SelectItem>
                   <SelectItem value="system">מערכת</SelectItem>
                 </SelectContent>
               </Select>
