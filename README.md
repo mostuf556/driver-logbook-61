@@ -84,7 +84,7 @@ src/
 -----------------------------------
 
 ## TODOs:
-
+- Exported Data: include undisclosed records 
 - Data Validation on CSV input: Import .csv on /contacts page allows duplicated records
 - UI Bug: The table body cells do not properly align with the corresponding header columns.
 - Data Ingestion: Modify the CSV import logic to detect and automatically skip duplicate records.
