@@ -1,0 +1,87 @@
+import type { AppSettings, CsvColumn } from "./types";
+
+export const DEFAULT_CSV_COLUMNS: CsvColumn[] = [
+  { key: "date", header: "תאריך", enabled: true },
+  { key: "driverName", header: "שם הנהג", enabled: true },
+  { key: "idNumber", header: "תעודת זהות", enabled: true },
+  { key: "phone", header: "טלפון", enabled: true },
+  { key: "carNumber", header: "מספר הרכב", enabled: true },
+  { key: "entryTime", header: "שעת כניסה", enabled: true },
+  { key: "exitTime", header: "שעת יציאה", enabled: true },
+  { key: "totalTime", header: "סהכ זמן", enabled: true },
+  { key: "approverName", header: "שם המאשר", enabled: true },
+  { key: "company", header: "חברה", enabled: true },
+  { key: "guardName", header: "שם השומר", enabled: true },
+];
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  direction: "rtl",
+  dateFormat: "dd/mm/yyyy",
+  timeFormat: "HH:mm",
+
+  retentionDays: 30,
+  keepOpenEntriesForever: true,
+  purgeOnAppLoad: true,
+  imageRetentionHours: 0,
+
+  autoFillDate: true,
+  autoFillEntryTime: true,
+  defaultCompany: "",
+  defaultApprover: "",
+  defaultGuard: "",
+  requireApprover: false,
+  requireGuard: false,
+  requireCarNumber: true,
+  requirePhone: false,
+  requireIdNumber: true,
+  allowOvernight: true,
+  roundTimesToMinutes: 1,
+  liveOnSiteBadge: true,
+
+  phoneMinLength: 9,
+  phoneMaxLength: 10,
+  phoneAllowedPrefixes: "0,+972",
+  idNumberLength: 9,
+  validateIsraeliId: false,
+  carNumberMinLength: 5,
+  carNumberMaxLength: 8,
+  carNumberAllowedChars: "^[0-9-]+$",
+
+  autocompleteEnabled: true,
+  autocompleteMinChars: 1,
+  autocompleteMaxSuggestions: 8,
+  autocompleteFields: [
+    "driverName",
+    "idNumber",
+    "phone",
+    "company",
+    "carNumber",
+    "approverName",
+    "guardName",
+  ],
+  autoFillOnSelect: true,
+  matchMode: "substring",
+  caseSensitive: false,
+
+  autoUpdateContactsOnSave: true,
+  contactUpsertKey: "idNumber",
+  contactFields: ["driverName", "idNumber", "phone", "company"],
+  confirmBeforeContactOverwrite: false,
+
+  csvFilenamePattern: "driver_report_dd_mm_yyyy",
+  csvDelimiter: ",",
+  csvIncludeBom: true,
+  csvQuotePhone: true,
+  csvColumns: DEFAULT_CSV_COLUMNS,
+  csvIncludeOpenEntries: false,
+
+  openRouterApiKey: "",
+  openRouterBaseUrl: "https://openrouter.ai/api/v1",
+  openRouterModel: "google/gemini-2.5-flash",
+  ocrPrompt: "Extract only the license plate number from this image. Return only the plate digits/characters, no other text.",
+  ocrAutoFillCarNumber: true,
+  ocrRequireConfirmation: true,
+  ocrMaxImageSizeMB: 5,
+
+  storageNamespace: "driver-report",
+};

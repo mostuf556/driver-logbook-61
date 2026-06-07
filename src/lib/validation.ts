@@ -1,0 +1,48 @@
+import type { AppSettings } from "./types";
+
+export function validatePhone(phone: string, s: AppSettings): string | null {
+  if (!phone) return s.requirePhone ? "טלפון חובה" : null;
+  if (!/^[\d+]+$/.test(phone)) return "טלפון חייב לכלול ספרות בלבד";
+  if (phone.length < s.phoneMinLength) return `טלפון קצר מדי (מינ׳ ${s.phoneMinLength})`;
+  if (phone.length > s.phoneMaxLength) return `טלפון ארוך מדי (מקס׳ ${s.phoneMaxLength})`;
+  const prefixes = s.phoneAllowedPrefixes
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (prefixes.length && !prefixes.some((p) => phone.startsWith(p))) {
+    return `טלפון חייב להתחיל ב-${prefixes.join(" / ")}`;
+  }
+  return null;
+}
+
+function israeliIdValid(id: string): boolean {
+  if (!/^\d{9}$/.test(id)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    let n = Number(id[i]) * ((i % 2) + 1);
+    if (n > 9) n -= 9;
+    sum += n;
+  }
+  return sum % 10 === 0;
+}
+
+export function validateIdNumber(id: string, s: AppSettings): string | null {
+  if (!id) return s.requireIdNumber ? "ת.ז. חובה" : null;
+  if (!/^\d+$/.test(id)) return "ת.ז. ספרות בלבד";
+  if (id.length !== s.idNumberLength) return `ת.ז. חייבת להיות ${s.idNumberLength} ספרות`;
+  if (s.validateIsraeliId && !israeliIdValid(id)) return "ת.ז. לא תקינה";
+  return null;
+}
+
+export function validateCarNumber(car: string, s: AppSettings): string | null {
+  if (!car) return s.requireCarNumber ? "מספר רכב חובה" : null;
+  if (car.length < s.carNumberMinLength) return `מספר רכב קצר מדי`;
+  if (car.length > s.carNumberMaxLength) return `מספר רכב ארוך מדי`;
+  try {
+    const re = new RegExp(s.carNumberAllowedChars);
+    if (!re.test(car)) return "תווים לא חוקיים במספר הרכב";
+  } catch {
+    /* ignore bad regex */
+  }
+  return null;
+}
