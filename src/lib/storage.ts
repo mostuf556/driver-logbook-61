@@ -1,6 +1,37 @@
 import { DEFAULT_SETTINGS } from "./defaults";
 import type { AppSettings, Contact, DriverReport, PendingImage } from "./types";
 
+type LegacyDriver = Partial<DriverReport> & { driverName?: string };
+type LegacyContact = Partial<Contact> & { driverName?: string };
+
+function splitName(name: string): { firstName: string; lastName: string } {
+  const t = (name || "").trim();
+  if (!t) return { firstName: "", lastName: "" };
+  const i = t.indexOf(" ");
+  if (i < 0) return { firstName: t, lastName: "" };
+  return { firstName: t.slice(0, i), lastName: t.slice(i + 1).trim() };
+}
+
+function migrateReport(r: LegacyDriver): DriverReport {
+  if (r.firstName === undefined && r.lastName === undefined && r.driverName !== undefined) {
+    const { firstName, lastName } = splitName(r.driverName);
+    return { ...(r as DriverReport), firstName, lastName };
+  }
+  return {
+    firstName: "",
+    lastName: "",
+    ...(r as DriverReport),
+  };
+}
+
+function migrateContact(c: LegacyContact): Contact {
+  if (c.firstName === undefined && c.lastName === undefined && c.driverName !== undefined) {
+    const { firstName, lastName } = splitName(c.driverName);
+    return { ...(c as Contact), firstName, lastName };
+  }
+  return { firstName: "", lastName: "", ...(c as Contact) };
+}
+
 const META_NS_KEY = "driver-report:namespace";
 
 function getNamespace(): string {
@@ -45,7 +76,7 @@ export function saveSettings(s: AppSettings) {
 
 // Reports
 export function loadReports(): DriverReport[] {
-  return read<DriverReport[]>("driver_reports", []);
+  return read<LegacyDriver[]>("driver_reports", []).map(migrateReport);
 }
 export function saveReports(list: DriverReport[]) {
   write("driver_reports", list);
@@ -53,7 +84,7 @@ export function saveReports(list: DriverReport[]) {
 
 // Contacts
 export function loadContacts(): Contact[] {
-  return read<Contact[]>("contacts", []);
+  return read<LegacyContact[]>("contacts", []).map(migrateContact);
 }
 export function saveContacts(list: Contact[]) {
   write("contacts", list);

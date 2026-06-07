@@ -10,7 +10,8 @@ export function upsertContactFromReport(
   const fields = s.contactFields;
   const candidate: Contact = {
     id: uid(),
-    driverName: fields.includes("driverName") ? r.driverName : "",
+    firstName: fields.includes("firstName") ? r.firstName : "",
+    lastName: fields.includes("lastName") ? r.lastName : "",
     idNumber: fields.includes("idNumber") ? r.idNumber : "",
     phone: fields.includes("phone") ? r.phone : "",
     company: fields.includes("company") ? r.company : "",
@@ -25,7 +26,10 @@ export function upsertContactFromReport(
         return candidate.phone ? contacts.findIndex((c) => c.phone === candidate.phone) : -1;
       case "name+company":
         return contacts.findIndex(
-          (c) => c.driverName === candidate.driverName && c.company === candidate.company,
+          (c) =>
+            c.firstName === candidate.firstName &&
+            c.lastName === candidate.lastName &&
+            c.company === candidate.company,
         );
     }
   };
@@ -42,7 +46,8 @@ export function upsertContactFromReport(
     return next;
   }
   if (
-    !candidate.driverName &&
+    !candidate.firstName &&
+    !candidate.lastName &&
     !candidate.idNumber &&
     !candidate.phone &&
     !candidate.company
@@ -62,23 +67,16 @@ export function getSuggestions(
   if (!s.autocompleteFields.includes(field)) return [];
   if (query.length < s.autocompleteMinChars) return [];
 
-  const sourceKey: keyof Contact =
-    field === "driverName"
-      ? "driverName"
-      : field === "idNumber"
-        ? "idNumber"
-        : field === "phone"
-          ? "phone"
-          : field === "company"
-            ? "company"
-            : field === "carNumber"
-              ? "driverName" // no carNumber stored in contacts
-              : field === "approverName"
-                ? "driverName"
-                : "driverName";
-
-  // carNumber / approverName / guardName are NOT in contacts, return [].
-  if (field === "carNumber" || field === "approverName" || field === "guardName") return [];
+  // Map autocomplete field → contact key. Fields not in contacts return [].
+  let sourceKey: keyof Contact;
+  switch (field) {
+    case "firstName": sourceKey = "firstName"; break;
+    case "lastName": sourceKey = "lastName"; break;
+    case "idNumber": sourceKey = "idNumber"; break;
+    case "phone": sourceKey = "phone"; break;
+    case "company": sourceKey = "company"; break;
+    default: return [];
+  }
 
   const q = s.caseSensitive ? query : query.toLowerCase();
   const seen = new Set<string>();
@@ -89,11 +87,15 @@ export function getSuggestions(
     const cmp = s.caseSensitive ? val : val.toLowerCase();
     const match = s.matchMode === "prefix" ? cmp.startsWith(q) : cmp.includes(q);
     if (!match) continue;
-    const dedupKey = val + "|" + c.company + "|" + c.idNumber;
+    const dedupKey = val + "|" + c.company + "|" + c.idNumber + "|" + c.firstName + c.lastName;
     if (seen.has(dedupKey)) continue;
     seen.add(dedupKey);
     out.push(c);
     if (out.length >= s.autocompleteMaxSuggestions) break;
   }
   return out;
+}
+
+export function contactFullName(c: Pick<Contact, "firstName" | "lastName">): string {
+  return [c.firstName, c.lastName].filter(Boolean).join(" ");
 }

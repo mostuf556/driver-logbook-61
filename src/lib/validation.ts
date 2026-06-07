@@ -36,8 +36,10 @@ export function validateIdNumber(id: string, s: AppSettings): string | null {
 
 export function validateCarNumber(car: string, s: AppSettings): string | null {
   if (!car) return s.requireCarNumber ? "מספר רכב חובה" : null;
-  if (car.length < s.carNumberMinLength) return `מספר רכב קצר מדי`;
-  if (car.length > s.carNumberMaxLength) return `מספר רכב ארוך מדי`;
+  // Ignore hyphens & whitespace when counting plate length.
+  const len = car.replace(/[-\s]/g, "").length;
+  if (len < s.carNumberMinLength) return `מספר רכב קצר מדי`;
+  if (len > s.carNumberMaxLength) return `מספר רכב ארוך מדי`;
   try {
     const re = new RegExp(s.carNumberAllowedChars);
     if (!re.test(car)) return "תווים לא חוקיים במספר הרכב";
@@ -45,4 +47,9 @@ export function validateCarNumber(car: string, s: AppSettings): string | null {
     /* ignore bad regex */
   }
   return null;
+}
+
+/** Strip hyphens, spaces, and dots so plates can be searched by partial digits. */
+export function normalizePlate(s: string): string {
+  return (s || "").replace(/[-\s.]/g, "").toLowerCase();
 }
