@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Download, Upload, FileUp } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/AppLayout";
 import { EntriesTable } from "@/components/EntriesTable";
@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppData } from "@/hooks/use-app-data";
-import { exportAllReports, exportReportsForDate } from "@/lib/csv";
+import { exportAllReports, exportReportsForDate, importReportsCsv } from "@/lib/csv";
 import { importAllJson } from "@/lib/storage";
 import { nowHHMM, todayISO } from "@/lib/time";
 import { normalizePlate } from "@/lib/validation";
@@ -32,6 +32,7 @@ function HomePage() {
   const { reports, settings, updateReports } = useAppData();
   const [exportDate, setExportDate] = useState(todayISO());
   const [plateQuery, setPlateQuery] = useState("");
+  const csvImportRef = useRef<HTMLInputElement>(null);
   const today = todayISO();
 
   const open = useMemo(() => reports.filter((r) => !r.exitTime), [reports]);
@@ -80,9 +81,38 @@ function HomePage() {
     input.click();
   };
 
+  const importCsvReports = async (file: File) => {
+    try {
+      const text = await file.text();
+      const imported = importReportsCsv(text);
+      if (!imported.length) {
+        toast.error("לא נמצאו רשומות בקובץ");
+        return;
+      }
+      const existingIds = new Set(reports.map((r) => r.id));
+      const newRecords = imported.filter((r) => !existingIds.has(r.id));
+      updateReports([...newRecords, ...reports]);
+      toast.success(`יובאו ${imported.length} רשומות מ-CSV`);
+    } catch {
+      toast.error("שגיאה בייבוא CSV");
+    }
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Hidden CSV import input */}
+        <input
+          ref={csvImportRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void importCsvReports(f);
+            if (csvImportRef.current) csvImportRef.current.value = "";
+          }}
+        />
         <div className="flex flex-wrap items-center justify-between gap-3" dir="rtl">
           <div>
             <h1 className="text-2xl font-bold">דוח כניסות ויציאות</h1>
@@ -125,7 +155,20 @@ function HomePage() {
                     <Upload />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>ייבוא נתונים</TooltipContent>
+                <TooltipContent>ייבוא נתונים (JSON)</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="ייבוא CSV"
+                    onClick={() => csvImportRef.current?.click()}
+                  >
+                    <FileUp />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>ייבוא רשומות מ-CSV</TooltipContent>
               </Tooltip>
               <Button
                 variant="outline"

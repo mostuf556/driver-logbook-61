@@ -1,5 +1,6 @@
 import { DEFAULT_CSV_COLUMNS } from "./defaults";
 import { computeTotalMinutes, filenameDate, formatDate, formatTotal, todayISO } from "./time";
+import { uid } from "./storage";
 import type { AppSettings, CsvColumnKey, DriverReport } from "./types";
 
 /** Parse one CSV line respecting quoted fields and Excel ="value" formula syntax. */
@@ -123,8 +124,77 @@ export function exportAllReports(reports: DriverReport[], s: AppSettings) {
   return list.length;
 }
 
-export function exportContactsCsv(
-  contacts: { firstName: string; lastName: string; idNumber: string; phone: string; company: string }[],
+/** Parse a date string from various formats (dd/mm/yyyy, dd.mm.yyyy, yyyy-mm-dd) → YYYY-MM-DD */
+function parseDate(v: string): string {
+  if (!v) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const dm = /^(\d{1,2})[./](\d{1,2})[./](\d{4})$/.exec(v);
+  if (dm) return `${dm[3]}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
+  return v;
+}
+
+/** Import a CSV file (text content) as DriverReport records.
+ *  Maps column headers to fields using both Hebrew and English variants.
+ *  Returns the parsed records; caller is responsible for merging/saving.
+ */
+export function importReportsCsv(text: string): DriverReport[] {
+  const clean = text.replace(/^\uFEFF/, "");
+  const lines = clean.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return [];
+
+  const headerLine = lines[0];
+  const delim = headerLine.includes("\t") ? "\t" : headerLine.includes(";") ? ";" : ",";
+  const headers = parseCsvLine(headerLine, delim).map((h) => h.trim());
+
+  // Map header text → CsvColumnKey
+  const HEADER_MAP: Record<string, CsvColumnKey> = {
+    "תאריך": "date", "date": "date",
+    "שם פרטי": "firstName", "firstname": "firstName", "first name": "firstName",
+    "שם משפחה": "lastName", "lastname": "lastName", "last name": "lastName",
+    "תעודת זהות": "idNumber", "idnumber": "idNumber", "id": "idNumber", "ת.ז.": "idNumber",
+    "טלפון": "phone", "phone": "phone",
+    "מספר רכב": "carNumber", "carnumber": "carNumber", "car number": "carNumber", "plate": "carNumber",
+    "שעת כניסה": "entryTime", "entrytime": "entryTime", "entry time": "entryTime", "כניסה": "entryTime",
+    "שעת יציאה": "exitTime", "exittime": "exitTime", "exit time": "exitTime", "יציאה": "exitTime",
+    "שם המאשר": "approverName", "approvername": "approverName", "approver": "approverName",
+    "חברה": "company", "company": "company",
+    "שם השומר": "guardName", "guardname": "guardName", "guard": "guardName",
+  };
+
+  const colMap: (CsvColumnKey | null)[] = headers.map((h) => HEADER_MAP[h.toLowerCase()] ?? HEADER_MAP[h] ?? null);
+
+  const records: DriverReport[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const fields = parseCsvLine(lines[i], delim);
+    const get = (key: CsvColumnKey): string => {
+      const idx = colMap.indexOf(key);
+      return idx >= 0 ? (fields[idx] ?? "").trim() : "";
+    };
+    const date = parseDate(get("date"));
+    const entryTime = get("entryTime");
+    if (!date && !entryTime) continue;
+    const exitRaw = get("exitTime");
+    records.push({
+      id: uid(),
+      date: date || todayISO(),
+      firstName: get("firstName"),
+      lastName: get("lastName"),
+      idNumber: get("idNumber"),
+      phone: get("phone"),
+      carNumber: get("carNumber"),
+      entryTime: entryTime || "00:00",
+      exitTime: exitRaw || null,
+      approverName: get("approverName"),
+      company: get("company"),
+      guardName: get("guardName"),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+  return records;
+}
+
+export function exportContactsCsv(  contacts: { firstName: string; lastName: string; idNumber: string; phone: string; company: string }[],
   s: AppSettings,
 ) {
   const delim = s.csvDelimiter;

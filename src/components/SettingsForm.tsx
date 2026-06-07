@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Accordion,
@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppData } from "@/hooks/use-app-data";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { clearAll, exportAllJson, importAllJson } from "@/lib/storage";
+import { clearTokenLog, loadTokenLog, totalTokensUsed, type TokenLogEntry } from "@/lib/openrouter";
 import type { AppSettings, AutocompleteField } from "@/lib/types";
 
 const AUTOCOMPLETE_FIELD_OPTIONS: { key: AutocompleteField; label: string }[] = [
@@ -366,6 +367,9 @@ export function SettingsForm() {
             <NumField label="גודל תמונה מקס׳ (MB)" value={s.ocrMaxImageSizeMB} onChange={(n) => set("ocrMaxImageSizeMB", n)} />
             <Toggle label="מלא מספר רכב אוטומטית" checked={s.ocrAutoFillCarNumber} onCheckedChange={(v) => set("ocrAutoFillCarNumber", v)} />
             <Toggle label="חייב אישור משתמש" checked={s.ocrRequireConfirmation} onCheckedChange={(v) => set("ocrRequireConfirmation", v)} />
+            <div className="sm:col-span-2">
+              <TokenUsageWidget />
+            </div>
           </AccordionContent>
         </AccordionItem>
 
@@ -409,6 +413,53 @@ export function SettingsForm() {
         <Button variant="outline" onClick={reset}>אפס לברירת מחדל</Button>
         <Button onClick={save}>שמור הגדרות</Button>
       </div>
+    </div>
+  );
+}
+
+function TokenUsageWidget() {
+  const [log, setLog] = useState<TokenLogEntry[]>([]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => {
+      setLog(loadTokenLog());
+      setTotal(totalTokensUsed());
+    };
+    refresh();
+  }, []);
+
+  const handleClear = () => {
+    clearTokenLog();
+    setLog([]);
+    setTotal(0);
+    toast.success("לוג טוקנים נוקה");
+  };
+
+  return (
+    <div className="rounded border p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">שימוש בטוקנים (OpenRouter)</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">סה״כ: {total.toLocaleString()}</span>
+          <Button variant="outline" size="sm" onClick={handleClear} disabled={log.length === 0}>נקה לוג</Button>
+        </div>
+      </div>
+      {log.length === 0 ? (
+        <p className="text-xs text-muted-foreground">אין נתוני שימוש</p>
+      ) : (
+        <div className="max-h-40 overflow-y-auto space-y-1">
+          {log.slice(0, 20).map((e, i) => (
+            <div key={i} className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">{new Date(e.at).toLocaleString("he-IL")}</span>
+              <span className="font-mono">{e.prompt_tokens}+{e.completion_tokens}={e.total_tokens}</span>
+            </div>
+          ))}
+          {log.length > 20 && (
+            <p className="text-xs text-muted-foreground text-center">ועוד {log.length - 20} רשומות...</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
