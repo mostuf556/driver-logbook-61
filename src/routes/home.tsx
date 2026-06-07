@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, Upload, FileUp } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/AppLayout";
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useAppData } from "@/hooks/use-app-data";
 import { exportAllReports, exportReportsForDate, importReportsCsv } from "@/lib/csv";
-import { importAllJson } from "@/lib/storage";
 import { nowHHMM, todayISO } from "@/lib/time";
 import { normalizePlate } from "@/lib/validation";
 
@@ -61,24 +60,6 @@ function HomePage() {
     );
     setPlateQuery("");
     toast.success("יציאה נרשמה");
-  };
-
-  const triggerImport = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.onchange = async () => {
-      const f = input.files?.[0];
-      if (!f) return;
-      try {
-        importAllJson(await f.text());
-        toast.success("יובא — מרענן");
-        setTimeout(() => location.reload(), 500);
-      } catch {
-        toast.error("קובץ לא תקין");
-      }
-    };
-    input.click();
   };
 
   const importCsvReports = async (file: File) => {
@@ -149,23 +130,10 @@ function HomePage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    aria-label="ייבוא JSON"
-                    onClick={triggerImport}
-                  >
-                    <Upload />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>ייבוא נתונים (JSON)</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
                     aria-label="ייבוא CSV"
                     onClick={() => csvImportRef.current?.click()}
                   >
-                    <FileUp />
+                    <Upload />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>ייבוא רשומות מ-CSV</TooltipContent>

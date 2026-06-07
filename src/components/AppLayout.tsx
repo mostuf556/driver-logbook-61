@@ -18,6 +18,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
     installErrorListeners();
   }, []);
 
+  // Reflect initial debug state in URL hash on first mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (debug && !window.location.hash.toLowerCase().includes("debug")) {
+      history.replaceState(null, "", window.location.pathname + window.location.search + "#debug");
+    }
+  }, [debug]);
+
   return (
     <div className="min-h-screen bg-background text-foreground" dir="rtl">
       <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm shadow-sm">

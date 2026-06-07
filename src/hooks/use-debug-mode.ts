@@ -1,44 +1,48 @@
 import { useEffect, useState } from "react";
 
+const STORAGE_KEY = "driver-report:debug-on";
+
+function readDebugState(): boolean {
+  if (typeof window === "undefined") return true;
+  // Hash takes priority when present
+  if (window.location.hash.toLowerCase().includes("debug=false")) return false;
+  if (window.location.hash.toLowerCase().includes("debug")) return true;
+  // Otherwise fall back to localStorage; default is ON (null → true)
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  return stored === null ? true : stored === "1";
+}
+
 export function useDebugMode(): boolean {
-  const [hashOn, setHashOn] = useState(false);
-  const [toggleOn, setToggleOn] = useState(false);
+  const [on, setOn] = useState(true); // default on for SSR
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const checkHash = () => setHashOn(window.location.hash.toLowerCase().includes("debug"));
-    checkHash();
-    window.addEventListener("hashchange", checkHash);
+    const sync = () => setOn(readDebugState());
+    sync();
 
-    const checkStorage = () => {
-      try {
-        setToggleOn(window.localStorage.getItem("driver-report:debug-on") === "1");
-      } catch { /* ignore */ }
-    };
-    checkStorage();
-    window.addEventListener("storage", checkStorage);
-
+    window.addEventListener("hashchange", sync);
+    window.addEventListener("storage", sync);
     return () => {
-      window.removeEventListener("hashchange", checkHash);
-      window.removeEventListener("storage", checkStorage);
+      window.removeEventListener("hashchange", sync);
+      window.removeEventListener("storage", sync);
     };
   }, []);
 
-  return hashOn || toggleOn;
+  return on;
 }
 
 export function setDebugFlag(on: boolean) {
   if (typeof window === "undefined") return;
 
-  // Sync localStorage
-  if (on) window.localStorage.setItem("driver-report:debug-on", "1");
-  else window.localStorage.removeItem("driver-report:debug-on");
+  // Persist to localStorage
+  window.localStorage.setItem(STORAGE_KEY, on ? "1" : "0");
 
-  // Sync URL hash
+  // Sync URL hash: set #debug or remove it
   if (on) {
     if (!window.location.hash.toLowerCase().includes("debug")) {
-      window.location.hash = "debug";
+      history.replaceState(null, "", window.location.pathname + window.location.search + "#debug");
+      window.dispatchEvent(new Event("hashchange"));
     }
   } else {
     if (window.location.hash.toLowerCase().includes("debug")) {

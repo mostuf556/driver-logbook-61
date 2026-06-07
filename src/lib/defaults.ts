@@ -89,5 +89,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
 
   storageNamespace: "driver-report",
 
-  showDebugToggle: false,
+  showDebugToggle: true,
 };
