@@ -59,18 +59,18 @@ export function EntriesTable({
   }
 
   return (
-    <div className="rounded-lg border bg-card" dir="rtl">
+    <div className="rounded-lg border bg-card overflow-x-auto" dir="rtl">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>תאריך</TableHead>
-            <TableHead>שם נהג</TableHead>
-            <TableHead>חברה</TableHead>
-            <TableHead>מספר רכב</TableHead>
-            <TableHead>כניסה</TableHead>
-            <TableHead>יציאה</TableHead>
-            <TableHead>סהכ זמן</TableHead>
-            <TableHead className="text-end">פעולות</TableHead>
+            <TableHead className="whitespace-nowrap">תאריך</TableHead>
+            <TableHead className="whitespace-nowrap">שם נהג</TableHead>
+            <TableHead className="whitespace-nowrap">חברה</TableHead>
+            <TableHead className="whitespace-nowrap">מספר רכב</TableHead>
+            <TableHead className="whitespace-nowrap">כניסה</TableHead>
+            <TableHead className="whitespace-nowrap">יציאה</TableHead>
+            <TableHead className="whitespace-nowrap">סהכ זמן</TableHead>
+            <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -80,15 +80,15 @@ export function EntriesTable({
             const fullName = [r.firstName, r.lastName].filter(Boolean).join(" ");
             return (
               <TableRow key={r.id} className={!r.exitTime ? "bg-accent/40" : ""}>
-                <TableCell>{formatDate(r.date, settings.dateFormat)}</TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="whitespace-nowrap">{formatDate(r.date, settings.dateFormat)}</TableCell>
+                <TableCell className="font-medium whitespace-nowrap">
                   {fullName}
                   <div className="text-xs text-muted-foreground">{r.idNumber}</div>
                 </TableCell>
-                <TableCell>{r.company}</TableCell>
-                <TableCell className="font-mono" dir="ltr">{r.carNumber}</TableCell>
-                <TableCell>{r.entryTime}</TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">{r.company}</TableCell>
+                <TableCell className="font-mono whitespace-nowrap" dir="ltr">{r.carNumber}</TableCell>
+                <TableCell className="whitespace-nowrap">{r.entryTime}</TableCell>
+                <TableCell className="whitespace-nowrap">
                   {r.exitTime ?? (
                     settings.liveOnSiteBadge ? (
                       <Badge variant="secondary">בפנים · {formatTotal(live)}</Badge>
@@ -97,8 +97,8 @@ export function EntriesTable({
                     )
                   )}
                 </TableCell>
-                <TableCell>{formatTotal(total)}</TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">{formatTotal(total)}</TableCell>
+                <TableCell className="whitespace-nowrap">
                   <div className="flex justify-end gap-1">
                     {showLeave && !r.exitTime && (
                       <Button size="sm" onClick={() => onLeave(r)}>

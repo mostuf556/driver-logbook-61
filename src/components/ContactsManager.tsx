@@ -69,9 +69,17 @@ export function ContactsManager() {
     const delim = header.includes("\t") ? "\t" : header.includes(";") ? ";" : ",";
     const cols = parseCsvLine(header, delim).map((c) => c.trim());
     const start = cols.some((c) => /שם|name|id|phone|company/i.test(c)) ? 1 : 0;
-    // legacy "שם הנהג" single-name column support
     const hasFull = cols.some((c) => /שם הנהג|driverName/i.test(c));
+
+    // Build dedup keys from existing contacts
+    const existingByIdNumber = new Set(contacts.map((c) => c.idNumber).filter(Boolean));
+    const existingByPhone = new Set(contacts.map((c) => c.phone).filter(Boolean));
+    const existingByName = new Set(
+      contacts.map((c) => `${c.firstName.trim()}|${c.lastName.trim()}|${c.company.trim()}`),
+    );
+
     const added: Contact[] = [];
+    let skipped = 0;
     for (let i = start; i < lines.length; i++) {
       const raw = parseCsvLine(lines[i], delim);
       let firstName = "", lastName = "", idNumber = "", phone = "", company = "";
@@ -84,11 +92,33 @@ export function ContactsManager() {
       } else {
         [firstName = "", lastName = "", idNumber = "", phone = "", company = ""] = raw;
       }
+      firstName = firstName.trim();
+      lastName = lastName.trim();
+      idNumber = idNumber.trim();
+      phone = phone.trim();
+      company = company.trim();
+
       if (!firstName && !lastName && !idNumber) continue;
-      added.push({ id: uid(), firstName, lastName, idNumber, phone, company });
+
+      // Skip duplicate: match by idNumber, then phone, then name+company
+      if (idNumber && existingByIdNumber.has(idNumber)) { skipped++; continue; }
+      if (phone && existingByPhone.has(phone)) { skipped++; continue; }
+      const nameKey = `${firstName}|${lastName}|${company}`;
+      if (existingByName.has(nameKey)) { skipped++; continue; }
+
+      const newContact: Contact = { id: uid(), firstName, lastName, idNumber, phone, company };
+      added.push(newContact);
+      // Track newly added records to prevent duplicates within the import batch itself
+      if (idNumber) existingByIdNumber.add(idNumber);
+      if (phone) existingByPhone.add(phone);
+      existingByName.add(nameKey);
     }
     updateContacts([...added, ...contacts]);
-    toast.success(`יובאו ${added.length} אנשי קשר`);
+    if (skipped > 0) {
+      toast.success(`יובאו ${added.length} אנשי קשר (${skipped} כפולות דולגו)`);
+    } else {
+      toast.success(`יובאו ${added.length} אנשי קשר`);
+    }
   };
 
   const filtered = contacts.filter((c) => {
@@ -156,12 +186,12 @@ export function ContactsManager() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>שם פרטי</TableHead>
-              <TableHead>שם משפחה</TableHead>
-              <TableHead>ת.ז.</TableHead>
-              <TableHead>טלפון</TableHead>
-              <TableHead>חברה</TableHead>
-              <TableHead className="text-end">פעולות</TableHead>
+              <TableHead className="whitespace-nowrap">שם פרטי</TableHead>
+              <TableHead className="whitespace-nowrap">שם משפחה</TableHead>
+              <TableHead className="whitespace-nowrap">ת.ז.</TableHead>
+              <TableHead className="whitespace-nowrap">טלפון</TableHead>
+              <TableHead className="whitespace-nowrap">חברה</TableHead>
+              <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -172,7 +202,7 @@ export function ContactsManager() {
                 <TableCell className="whitespace-nowrap font-mono">{c.idNumber}</TableCell>
                 <TableCell className="whitespace-nowrap font-mono" dir="ltr">{c.phone}</TableCell>
                 <TableCell className="whitespace-nowrap">{c.company}</TableCell>
-                <TableCell className="text-end">
+                <TableCell className="whitespace-nowrap text-end">
                   <div className="flex justify-end gap-1">
                     <Button size="icon" variant="ghost" onClick={() => setEditing(c)}>
                       <Pencil />

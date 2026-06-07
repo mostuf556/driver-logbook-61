@@ -154,7 +154,11 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         <Label>מספר רכב</Label>
         <div className="flex gap-2">
           <Input value={form.carNumber} onChange={(e) => set("carNumber", e.target.value)} dir="ltr" />
-          <PlateOcrDialog settings={settings} onConfirm={(p) => set("carNumber", p)} />
+          <PlateOcrDialog
+            settings={settings}
+            onConfirm={(p) => set("carNumber", p)}
+            onNavigateToSettings={() => navigate({ to: "/settings" })}
+          />
         </div>
       </div>
       <div className="space-y-1.5">

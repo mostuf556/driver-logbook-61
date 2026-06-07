@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Accordion,
@@ -344,22 +345,73 @@ export function SettingsForm() {
         <AccordionItem value="ocr">
           <AccordionTrigger>זיהוי לוחית רכב (OpenRouter)</AccordionTrigger>
           <AccordionContent className="grid gap-4 sm:grid-cols-2">
-            <Field label="OpenRouter API Key" className="sm:col-span-2">
+            {/* Multi-key manager */}
+            <div className="sm:col-span-2 space-y-2">
+              <Label>מפתחות API (Round-Robin)</Label>
+              <p className="text-xs text-muted-foreground">
+                הוסף מספר מפתחות לחלוקת עומסים אוטומטית. כאשר קיים לפחות מפתח אחד ברשימה, השדה הבודד למטה מתעלם.
+              </p>
+              <div className="space-y-2">
+                {(s.openRouterApiKeys ?? []).map((key, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Input
+                      type="password"
+                      value={key}
+                      placeholder={`מפתח ${idx + 1} — sk-or-...`}
+                      onChange={(e) => {
+                        const next = [...(s.openRouterApiKeys ?? [])];
+                        next[idx] = e.target.value;
+                        set("openRouterApiKeys", next);
+                      }}
+                      className="flex-1 font-mono text-xs"
+                      dir="ltr"
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="shrink-0 text-destructive hover:text-destructive"
+                      onClick={() => {
+                        const next = (s.openRouterApiKeys ?? []).filter((_, i) => i !== idx);
+                        set("openRouterApiKeys", next);
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => set("openRouterApiKeys", [...(s.openRouterApiKeys ?? []), ""])}
+              >
+                <Plus className="size-4" />
+                הוסף מפתח
+              </Button>
+            </div>
+
+            {/* Single fallback key */}
+            <Field label="מפתח API בודד (גיבוי)" className="sm:col-span-2">
               <Input
                 type="password"
                 value={s.openRouterApiKey}
                 onChange={(e) => set("openRouterApiKey", e.target.value)}
                 placeholder="sk-or-..."
+                dir="ltr"
+                className="font-mono text-xs"
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                נשמר באופן מקומי בדפדפן זה בלבד.
+                בשימוש רק אם אין מפתחות ברשימה למעלה. נשמר מקומית בדפדפן זה בלבד.
               </p>
             </Field>
+
             <Field label="Base URL">
-              <Input value={s.openRouterBaseUrl} onChange={(e) => set("openRouterBaseUrl", e.target.value)} />
+              <Input value={s.openRouterBaseUrl} onChange={(e) => set("openRouterBaseUrl", e.target.value)} dir="ltr" />
             </Field>
             <Field label="מודל">
-              <Input value={s.openRouterModel} onChange={(e) => set("openRouterModel", e.target.value)} />
+              <Input value={s.openRouterModel} onChange={(e) => set("openRouterModel", e.target.value)} dir="ltr" />
             </Field>
             <Field label="פרומפט" className="sm:col-span-2">
               <Textarea value={s.ocrPrompt} onChange={(e) => set("ocrPrompt", e.target.value)} rows={3} />

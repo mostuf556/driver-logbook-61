@@ -1,6 +1,6 @@
-import { Link, useLocation } from "@tanstack/react-router";
-import { Bug } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Bug, Menu, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
@@ -9,16 +9,24 @@ import { useDebugMode, setDebugFlag } from "@/hooks/use-debug-mode";
 import { useTheme } from "@/hooks/use-theme";
 import { installErrorListeners } from "@/lib/error-log";
 
+const NAV_ITEMS = [
+  { to: "/home", label: "כניסות" },
+  { to: "/contacts", label: "אנשי קשר" },
+  { to: "/logs", label: "לוגים" },
+  { to: "/settings", label: "הגדרות" },
+] as const;
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const { settings } = useAppData();
   useTheme(settings.theme);
   const debug = useDebugMode();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     installErrorListeners();
   }, []);
 
-  // Reflect initial debug state in URL hash on first mount
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (debug && !window.location.hash.toLowerCase().includes("debug")) {
@@ -26,25 +34,31 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [debug]);
 
+  // Close mobile menu on navigate
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-background text-foreground" dir="rtl">
       <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto flex h-14 items-center justify-between gap-4 px-4">
+        <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-4">
+          {/* Logo */}
           <Link
             to="/home"
-            className="flex items-center gap-2 text-base font-bold tracking-tight text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-2 text-base font-bold tracking-tight text-foreground hover:text-primary transition-colors shrink-0"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold select-none">
               נ
             </span>
-            דוח נהגים
+            <span className="hidden sm:inline">דוח נהגים</span>
           </Link>
 
-          <nav className="flex items-center gap-0.5 text-sm">
-            <NavLink to="/home">כניסות</NavLink>
-            <NavLink to="/contacts">אנשי קשר</NavLink>
-            <NavLink to="/logs">לוגים</NavLink>
-            <NavLink to="/settings">הגדרות</NavLink>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5 text-sm">
+            {NAV_ITEMS.map((item) => (
+              <NavLink key={item.to} to={item.to}>{item.label}</NavLink>
+            ))}
 
             {(settings.showDebugToggle || debug) && (
               <Button
@@ -60,7 +74,46 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="ms-1 border-r h-5 border-border" />
             <ThemeSwitcher />
           </nav>
+
+          {/* Mobile: theme + hamburger */}
+          <div className="flex md:hidden items-center gap-1">
+            <ThemeSwitcher />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="תפריט ניווט"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+            >
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </Button>
+          </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-card/98 backdrop-blur-sm">
+            <nav className="container mx-auto flex flex-col px-4 py-2 gap-0.5">
+              {NAV_ITEMS.map((item) => (
+                <MobileNavLink
+                  key={item.to}
+                  to={item.to}
+                  onSelect={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </MobileNavLink>
+              ))}
+              {(settings.showDebugToggle || debug) && (
+                <button
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
+                  onClick={() => { setDebugFlag(!debug); setMobileMenuOpen(false); }}
+                >
+                  <Bug className="size-4" />
+                  {debug ? "בטל דיבאג" : "מצב דיבאג"}
+                </button>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="container mx-auto px-4 py-6">{children}</main>
@@ -87,6 +140,34 @@ function NavLink({ to, children }: { to: string; children: ReactNode }) {
       {isActive && (
         <span className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-[3px] h-0.5 w-4 rounded-full bg-primary" />
       )}
+    </Link>
+  );
+}
+
+function MobileNavLink({
+  to,
+  children,
+  onSelect,
+}: {
+  to: string;
+  children: ReactNode;
+  onSelect: () => void;
+}) {
+  const location = useLocation();
+  const isActive = location.pathname === to || location.pathname.startsWith(to + "/");
+
+  return (
+    <Link
+      to={to}
+      onClick={onSelect}
+      className={[
+        "rounded-md px-3 py-2.5 text-sm font-medium transition-colors block",
+        isActive
+          ? "text-foreground bg-accent"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+      ].join(" ")}
+    >
+      {children}
     </Link>
   );
 }

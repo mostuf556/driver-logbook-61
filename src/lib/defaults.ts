@@ -77,7 +77,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   csvIncludeBom: true,
   csvQuotePhone: true,
   csvColumns: DEFAULT_CSV_COLUMNS,
-  csvIncludeOpenEntries: false,
+  csvIncludeOpenEntries: true,
 
   openRouterApiKey: "",
   openRouterApiKeys: [],

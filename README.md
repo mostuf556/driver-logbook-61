@@ -12,24 +12,29 @@ A Hebrew-first RTL web app for managing driver entry/exit records at a gated fac
 - Overnight crossing support (exit before entry time counted as next-day)
 
 ### CSV Export & Import
-- Export records for a specific date or all records to CSV
+- Export records for a specific date or all records to CSV (open/undisclosed entries included by default)
 - Import records from CSV with automatic header detection (Hebrew and English column names)
+- Automatic duplicate detection on import: skips records with matching date + car number + entry time
 - Configurable columns: toggle, reorder, and rename each column
 - BOM support for Excel compatibility, configurable delimiter (`,` `;` `\t`)
 - Phone number quoted as Excel formula to preserve leading zero
-- Duplicate detection on import: skips records with matching date + car number + entry time
 
 ### Contacts
 - Auto-maintain a contacts list from saved entries (configurable fields and upsert key)
 - Full CRUD contact management page
-- Export/import contacts as CSV
+- Export/import contacts as CSV with automatic duplicate detection (matches by ID, phone, or name+company)
 
 ### OCR — License Plate Recognition
 - Capture plate photo via device camera or pick from gallery (two separate buttons)
 - Sends image to OpenRouter vision API (configurable model, prompt, base URL)
-- Supports multiple API keys with automatic round-robin rotation
+- **Multiple API keys** with automatic round-robin rotation — add and manage a list of keys in Settings
 - Auto-fills car number field; optional confirmation dialog before applying
 - Token usage log (persisted, per-call breakdown, clearable)
+- Clickable error toast navigates directly to Settings when API key is missing
+
+### Navigation & Notifications
+- Error toasts for missing OpenRouter API key include a direct link to the Settings page
+- Fully responsive layout — hamburger menu on mobile, horizontal nav on desktop
 
 ### Settings
 - Date/time format, RTL/LTR direction, theme (light, dark, blue, green, warm, system)
@@ -65,7 +70,7 @@ src/
   routes/           # File-based pages (home, contacts, entries/[id], logs, settings)
 ```
 
-## Future Development Ideas
+## Roadmap
 
 - **Cloud sync** — optional Supabase backend so data survives device wipe and supports multi-device
 - **Multi-site / multi-guard** — tenant isolation so multiple gates share one deployment
@@ -80,15 +85,3 @@ src/
 - **Print / PDF export** — formatted daily report for physical sign-off
 - **LDAP / Active Directory integration** — auto-lookup driver details from corporate directory
 - **Two-way SMS** — send driver an entry confirmation / exit reminder via Twilio or similar
-
------------------------------------
-
-## TODOs:
-- Exported Data: include undisclosed records 
-- Data Validation on CSV input: Import .csv on /contacts page allows duplicated records
-- UI Bug: The table body cells do not properly align with the corresponding header columns.
-- Data Ingestion: Modify the CSV import logic to detect and automatically skip duplicate records.
-- Documentation: Refresh the README file to include an overview of application features and a roadmap for future development.
-- Navigation: Upgrade error notifications to be clickable. Triggering the notification should route the user to the exact page, section, or input field requiring - attention (e.g., redirecting to the settings page for a missing OpenRouter key).
-- API Management: Allow users to configure multiple OpenRouter API keys and implement a round-robin strategy to distribute requests between them.
-- fix responsive design for mobile device view
