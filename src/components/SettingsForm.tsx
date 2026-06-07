@@ -25,14 +25,16 @@ import { clearAll, exportAllJson, importAllJson } from "@/lib/storage";
 import type { AppSettings, AutocompleteField } from "@/lib/types";
 
 const AUTOCOMPLETE_FIELD_OPTIONS: { key: AutocompleteField; label: string }[] = [
-  { key: "driverName", label: "שם הנהג" },
+  { key: "firstName", label: "שם פרטי" },
+  { key: "lastName", label: "שם משפחה" },
   { key: "idNumber", label: "ת.ז." },
   { key: "phone", label: "טלפון" },
   { key: "company", label: "חברה" },
 ];
 
 const CONTACT_FIELD_OPTIONS = [
-  { key: "driverName" as const, label: "שם הנהג" },
+  { key: "firstName" as const, label: "שם פרטי" },
+  { key: "lastName" as const, label: "שם משפחה" },
   { key: "idNumber" as const, label: "ת.ז." },
   { key: "phone" as const, label: "טלפון" },
   { key: "company" as const, label: "חברה" },
