@@ -17,7 +17,8 @@ function migrateReport(r: LegacyDriver): DriverReport {
     const { firstName, lastName } = splitName(r.driverName);
     return { ...(r as DriverReport), firstName, lastName };
   }
-  return { firstName: r.firstName ?? "", lastName: r.lastName ?? "", ...(r as DriverReport) };
+  const base = r as DriverReport;
+  return { ...base, firstName: r.firstName ?? "", lastName: r.lastName ?? "" };
 }
 
 function migrateContact(c: LegacyContact): Contact {
@@ -25,7 +26,8 @@ function migrateContact(c: LegacyContact): Contact {
     const { firstName, lastName } = splitName(c.driverName);
     return { ...(c as Contact), firstName, lastName };
   }
-  return { firstName: c.firstName ?? "", lastName: c.lastName ?? "", ...(c as Contact) };
+  const base = c as Contact;
+  return { ...base, firstName: c.firstName ?? "", lastName: c.lastName ?? "" };
 }
 
 const META_NS_KEY = "driver-report:namespace";
