@@ -91,3 +91,4 @@ src/
 - Documentation: Refresh the README file to include an overview of application features and a roadmap for future development.
 - Navigation: Upgrade error notifications to be clickable. Triggering the notification should route the user to the exact page, section, or input field requiring - attention (e.g., redirecting to the settings page for a missing OpenRouter key).
 - API Management: Allow users to configure multiple OpenRouter API keys and implement a round-robin strategy to distribute requests between them.
+- fix responsive design for mobile device view
