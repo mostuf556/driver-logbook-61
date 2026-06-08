@@ -22,6 +22,7 @@ export interface Contact {
   idNumber: string;
   phone: string;
   company: string;
+  carNumbers: string[];
 }
 
 export interface PendingImage {
@@ -111,7 +112,7 @@ export interface AppSettings {
   // Contacts
   autoUpdateContactsOnSave: boolean;
   contactUpsertKey: "idNumber" | "phone" | "name+company";
-  contactFields: ("firstName" | "lastName" | "idNumber" | "phone" | "company")[];
+  contactFields: ("firstName" | "lastName" | "idNumber" | "phone" | "company" | "carNumbers")[];
   confirmBeforeContactOverwrite: boolean;
   contactsFilenamePattern: string;
 

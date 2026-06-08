@@ -45,9 +45,22 @@ function HomePage() {
   );
 
   const matches = useMemo(() => {
-    const q = normalizePlate(plateQuery);
+    const q = plateQuery.trim();
     if (!q) return [] as typeof open;
-    return open.filter((r) => normalizePlate(r.carNumber).includes(q));
+    const normalizedQuery = normalizePlate(q);
+    return open.filter((r) => {
+      const haystack = [
+        r.carNumber,
+        r.firstName,
+        r.lastName,
+        r.idNumber,
+        r.phone,
+        r.company,
+      ]
+        .map(normalizePlate)
+        .join(" ");
+      return haystack.includes(normalizedQuery);
+    });
   }, [open, plateQuery]);
 
   const exitMatch = (id: string) => {
@@ -162,11 +175,10 @@ function HomePage() {
         <section className="space-y-2" dir="rtl">
           <h2 className="text-lg font-semibold">חיפוש מהיר ליציאה</h2>
           <Input
-            placeholder="הזן ספרות ממספר הרכב (ללא '-')"
+            placeholder="חפש רכב, שם, ת.ז. או טלפון"
             value={plateQuery}
             onChange={(e) => setPlateQuery(e.target.value)}
-            inputMode="numeric"
-            dir="ltr"
+            inputMode="text"
             className="max-w-sm"
           />
           {plateQuery && (
@@ -198,7 +210,7 @@ function HomePage() {
 
         <section className="space-y-2" dir="rtl">
           <h2 className="text-lg font-semibold">בפנים כרגע</h2>
-          <EntriesTable rows={open} showLeave />
+          <EntriesTable rows={open} showLeave hideExitColumns />
         </section>
 
         <section className="space-y-2" dir="rtl">

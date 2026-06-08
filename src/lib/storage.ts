@@ -24,10 +24,15 @@ function migrateReport(r: LegacyDriver): DriverReport {
 function migrateContact(c: LegacyContact): Contact {
   if (c.firstName === undefined && c.lastName === undefined && c.driverName !== undefined) {
     const { firstName, lastName } = splitName(c.driverName);
-    return { ...(c as Contact), firstName, lastName };
+    return { ...(c as Contact), firstName, lastName, carNumbers: c.carNumbers ?? [] };
   }
   const base = c as Contact;
-  return { ...base, firstName: c.firstName ?? "", lastName: c.lastName ?? "" };
+  return {
+    ...base,
+    firstName: c.firstName ?? "",
+    lastName: c.lastName ?? "",
+    carNumbers: c.carNumbers ?? [],
+  };
 }
 
 const META_NS_KEY = "driver-report:namespace";

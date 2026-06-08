@@ -63,5 +63,6 @@ export function randomContact(): Contact {
     idNumber: israeliId(),
     phone: phone(),
     company: pick(COMPANIES),
+    carNumbers: [plate()],
   };
 }

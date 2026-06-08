@@ -2,9 +2,10 @@ import type { AppSettings } from "./types";
 
 export function validatePhone(phone: string, s: AppSettings): string | null {
   if (!phone) return s.requirePhone ? "טלפון חובה" : null;
-  if (!/^[\d+]+$/.test(phone)) return "טלפון חייב לכלול ספרות בלבד";
-  if (phone.length < s.phoneMinLength) return `טלפון קצר מדי (מינ׳ ${s.phoneMinLength})`;
-  if (phone.length > s.phoneMaxLength) return `טלפון ארוך מדי (מקס׳ ${s.phoneMaxLength})`;
+  const normalized = phone.replace(/-/g, "");
+  if (!/^[\d+\-]+$/.test(phone)) return "טלפון חייב לכלול ספרות, + או -";
+  if (normalized.length < s.phoneMinLength) return `טלפון קצר מדי (מינ׳ ${s.phoneMinLength})`;
+  if (normalized.length > s.phoneMaxLength) return `טלפון ארוך מדי (מקס׳ ${s.phoneMaxLength})`;
   const prefixes = s.phoneAllowedPrefixes
     .split(",")
     .map((p) => p.trim())

@@ -15,6 +15,7 @@ export function upsertContactFromReport(
     idNumber: fields.includes("idNumber") ? r.idNumber : "",
     phone: fields.includes("phone") ? r.phone : "",
     company: fields.includes("company") ? r.company : "",
+    carNumbers: fields.includes("carNumbers") && r.carNumber ? [r.carNumber] : [],
   };
   const findIdx = () => {
     switch (s.contactUpsertKey) {
@@ -39,7 +40,12 @@ export function upsertContactFromReport(
     (Object.keys(candidate) as (keyof Contact)[]).forEach((k) => {
       if (k === "id") return;
       const v = candidate[k];
-      if (v) (merged as Record<string, string>)[k] = v;
+      if (!v) return;
+      if (k === "carNumbers") {
+        merged.carNumbers = Array.from(new Set([...(merged.carNumbers || []), ...candidate.carNumbers]));
+        return;
+      }
+      (merged as Record<string, string>)[k] = v as string;
     });
     const next = [...contacts];
     next[idx] = merged;
@@ -75,6 +81,7 @@ export function getSuggestions(
     case "idNumber": sourceKey = "idNumber"; break;
     case "phone": sourceKey = "phone"; break;
     case "company": sourceKey = "company"; break;
+    case "carNumber": sourceKey = "carNumbers"; break;
     default: return [];
   }
 
@@ -82,12 +89,25 @@ export function getSuggestions(
   const seen = new Set<string>();
   const out: Contact[] = [];
   for (const c of contacts) {
-    const val = (c[sourceKey] || "") as string;
-    if (!val) continue;
-    const cmp = s.caseSensitive ? val : val.toLowerCase();
-    const match = s.matchMode === "prefix" ? cmp.startsWith(q) : cmp.includes(q);
-    if (!match) continue;
-    const dedupKey = val + "|" + c.company + "|" + c.idNumber + "|" + c.firstName + c.lastName;
+    const rawValue = c[sourceKey] ?? "";
+    let matched = false;
+    let dedupValue = "";
+
+    if (Array.isArray(rawValue)) {
+      const values = rawValue.filter(Boolean) as string[];
+      const normalized = values.map((v) => (s.caseSensitive ? v : v.toLowerCase()));
+      matched = normalized.some((val) => (s.matchMode === "prefix" ? val.startsWith(q) : val.includes(q)));
+      dedupValue = values.join(",");
+    } else {
+      const val = rawValue as string;
+      if (!val) continue;
+      const cmp = s.caseSensitive ? val : val.toLowerCase();
+      matched = s.matchMode === "prefix" ? cmp.startsWith(q) : cmp.includes(q);
+      dedupValue = val;
+    }
+
+    if (!matched) continue;
+    const dedupKey = dedupValue + "|" + c.company + "|" + c.idNumber + "|" + c.firstName + c.lastName;
     if (seen.has(dedupKey)) continue;
     seen.add(dedupKey);
     out.push(c);

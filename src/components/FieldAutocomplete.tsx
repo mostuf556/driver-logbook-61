@@ -53,6 +53,8 @@ export function FieldAutocomplete({
         return c.phone;
       case "company":
         return c.company;
+      case "carNumber":
+        return c.carNumbers?.[0] ?? "";
       default:
         return "";
     }

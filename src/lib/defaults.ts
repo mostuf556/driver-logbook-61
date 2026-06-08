@@ -68,7 +68,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
 
   autoUpdateContactsOnSave: true,
   contactUpsertKey: "idNumber",
-  contactFields: ["firstName", "lastName", "idNumber", "phone", "company"],
+  contactFields: ["firstName", "lastName", "idNumber", "phone", "company", "carNumbers"],
   confirmBeforeContactOverwrite: false,
   contactsFilenamePattern: "contact_list_dd_mm_yyyy",
 

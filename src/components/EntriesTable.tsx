@@ -26,9 +26,11 @@ import type { DriverReport } from "@/lib/types";
 export function EntriesTable({
   rows,
   showLeave,
+  hideExitColumns,
 }: {
   rows: DriverReport[];
   showLeave?: boolean;
+  hideExitColumns?: boolean;
 }) {
   const { settings, reports, updateReports } = useAppData();
   const [, setTick] = useState(0);
@@ -54,22 +56,24 @@ export function EntriesTable({
     toast.success("נמחק");
   };
 
+  const hideExit = hideExitColumns ?? rows.every((r) => !r.exitTime);
+
   if (!rows.length) {
     return <div className="rounded border border-dashed p-6 text-center text-sm text-muted-foreground">אין רשומות</div>;
   }
 
   return (
-    <div className="rounded-lg border bg-card overflow-x-auto" dir="rtl">
+    <div className="rounded-lg border bg-card overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="whitespace-nowrap">תאריך</TableHead>
             <TableHead className="whitespace-nowrap">שם נהג</TableHead>
-            <TableHead className="whitespace-nowrap">חברה</TableHead>
+            <TableHead className="hidden sm:table-cell whitespace-nowrap">חברה</TableHead>
             <TableHead className="whitespace-nowrap">מספר רכב</TableHead>
             <TableHead className="whitespace-nowrap">כניסה</TableHead>
-            <TableHead className="whitespace-nowrap">יציאה</TableHead>
-            <TableHead className="whitespace-nowrap">סהכ זמן</TableHead>
+            {!hideExit && <TableHead className="whitespace-nowrap">יציאה</TableHead>}
+            {!hideExit && <TableHead className="whitespace-nowrap">סהכ זמן</TableHead>}
             <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
           </TableRow>
         </TableHeader>
@@ -85,19 +89,21 @@ export function EntriesTable({
                   {fullName}
                   <div className="text-xs text-muted-foreground">{r.idNumber}</div>
                 </TableCell>
-                <TableCell className="whitespace-nowrap">{r.company}</TableCell>
-                <TableCell className="font-mono whitespace-nowrap" dir="ltr">{r.carNumber}</TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap">{r.company}</TableCell>
+                <TableCell className="font-mono whitespace-nowrap">{r.carNumber}</TableCell>
                 <TableCell className="whitespace-nowrap">{r.entryTime}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {r.exitTime ?? (
-                    settings.liveOnSiteBadge ? (
-                      <Badge variant="secondary">בפנים · {formatTotal(live)}</Badge>
-                    ) : (
-                      <Badge variant="secondary">בפנים</Badge>
-                    )
-                  )}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">{formatTotal(total)}</TableCell>
+                {!hideExit && (
+                  <TableCell className="whitespace-nowrap">
+                    {r.exitTime ?? (
+                      settings.liveOnSiteBadge ? (
+                        <Badge variant="secondary">בפנים · {formatTotal(live)}</Badge>
+                      ) : (
+                        <Badge variant="secondary">בפנים</Badge>
+                      )
+                    )}
+                  </TableCell>
+                )}
+                {!hideExit && <TableCell className="whitespace-nowrap">{formatTotal(total)}</TableCell>}
                 <TableCell className="whitespace-nowrap">
                   <div className="flex justify-end gap-1">
                     {showLeave && !r.exitTime && (

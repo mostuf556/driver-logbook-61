@@ -27,7 +27,7 @@ import { randomContact } from "@/lib/debug-data";
 import { uid } from "@/lib/storage";
 import type { Contact } from "@/lib/types";
 
-const EMPTY: Contact = { id: "", firstName: "", lastName: "", idNumber: "", phone: "", company: "" };
+const EMPTY: Contact = { id: "", firstName: "", lastName: "", idNumber: "", phone: "", company: "", carNumbers: [] };
 
 export function ContactsManager() {
   const { contacts, updateContacts, settings } = useAppData();
@@ -68,10 +68,17 @@ export function ContactsManager() {
     const header = lines[0];
     const delim = header.includes("\t") ? "\t" : header.includes(";") ? ";" : ",";
     const cols = parseCsvLine(header, delim).map((c) => c.trim());
+    const getIndex = (patterns: RegExp[]) => cols.findIndex((c) => patterns.some((re) => re.test(c)));
+    const fullNameIndex = getIndex([/שם הנהג|driverName/i]);
+    const firstNameIndex = getIndex([/שם פרטי|firstname|first name/i]);
+    const lastNameIndex = getIndex([/שם משפחה|lastname|last name/i]);
+    const idIndex = getIndex([/תעודת זהות|idnumber|id|ת\.ז\./i]);
+    const phoneIndex = getIndex([/טלפון|phone/i]);
+    const companyIndex = getIndex([/חברה|company/i]);
+    const carsIndex = getIndex([/מספר רכב|plate|car number|car/i]);
     const start = cols.some((c) => /שם|name|id|phone|company/i.test(c)) ? 1 : 0;
-    const hasFull = cols.some((c) => /שם הנהג|driverName/i.test(c));
+    const hasFull = fullNameIndex >= 0;
 
-    // Build dedup keys from existing contacts
     const existingByIdNumber = new Set(contacts.map((c) => c.idNumber).filter(Boolean));
     const existingByPhone = new Set(contacts.map((c) => c.phone).filter(Boolean));
     const existingByName = new Set(
@@ -82,33 +89,45 @@ export function ContactsManager() {
     let skipped = 0;
     for (let i = start; i < lines.length; i++) {
       const raw = parseCsvLine(lines[i], delim);
-      let firstName = "", lastName = "", idNumber = "", phone = "", company = "";
+      const getRaw = (index: number) => (index >= 0 ? (raw[index] ?? "").trim() : "");
+      let firstName = "";
+      let lastName = "";
       if (hasFull) {
-        const [name = "", id = "", ph = "", co = ""] = raw;
-        const parts = name.trim().split(/\s+/);
+        const fullName = getRaw(fullNameIndex);
+        const parts = fullName.trim().split(/\s+/);
         firstName = parts[0] || "";
         lastName = parts.slice(1).join(" ");
-        idNumber = id; phone = ph; company = co;
       } else {
-        [firstName = "", lastName = "", idNumber = "", phone = "", company = ""] = raw;
+        firstName = getRaw(firstNameIndex);
+        lastName = getRaw(lastNameIndex);
       }
-      firstName = firstName.trim();
-      lastName = lastName.trim();
-      idNumber = idNumber.trim();
-      phone = phone.trim();
-      company = company.trim();
+
+      const idNumber = getRaw(idIndex);
+      const phone = getRaw(phoneIndex);
+      const company = getRaw(companyIndex);
+      const carNumbersRaw = getRaw(carsIndex);
+      const carNumbers = carNumbersRaw
+        .split(/[;,]+/)
+        .map((v) => v.trim())
+        .filter(Boolean);
 
       if (!firstName && !lastName && !idNumber) continue;
 
-      // Skip duplicate: match by idNumber, then phone, then name+company
       if (idNumber && existingByIdNumber.has(idNumber)) { skipped++; continue; }
       if (phone && existingByPhone.has(phone)) { skipped++; continue; }
       const nameKey = `${firstName}|${lastName}|${company}`;
       if (existingByName.has(nameKey)) { skipped++; continue; }
 
-      const newContact: Contact = { id: uid(), firstName, lastName, idNumber, phone, company };
+      const newContact: Contact = {
+        id: uid(),
+        firstName,
+        lastName,
+        idNumber,
+        phone,
+        company,
+        carNumbers,
+      };
       added.push(newContact);
-      // Track newly added records to prevent duplicates within the import batch itself
       if (idNumber) existingByIdNumber.add(idNumber);
       if (phone) existingByPhone.add(phone);
       existingByName.add(nameKey);
@@ -124,19 +143,25 @@ export function ContactsManager() {
   const filtered = contacts.filter((c) => {
     if (!filter) return true;
     const q = filter.toLowerCase();
-    return [c.firstName, c.lastName, c.idNumber, c.phone, c.company].some((v) =>
-      (v || "").toLowerCase().includes(q),
-    );
+    return [c.firstName, c.lastName, c.idNumber, c.phone, c.company]
+      .some((v) => (v || "").toLowerCase().includes(q)) ||
+      c.carNumbers.some((n) => n.toLowerCase().includes(q));
   });
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6">
       <form onSubmit={add} className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="שם פרטי" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
         <Field label="שם משפחה" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
         <Field label="ת.ז." value={form.idNumber} onChange={(v) => setForm({ ...form, idNumber: v })} />
         <Field label="טלפון" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
         <Field label="חברה" value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
+        <Field
+          label="מספרי רכב"
+          value={form.carNumbers.join(", ")}
+          onChange={(v) => setForm({ ...form, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
+          className="sm:col-span-2"
+        />
         <div className="flex items-end gap-2">
           {debug && (
             <Button
@@ -190,7 +215,8 @@ export function ContactsManager() {
               <TableHead className="whitespace-nowrap">שם משפחה</TableHead>
               <TableHead className="whitespace-nowrap">ת.ז.</TableHead>
               <TableHead className="whitespace-nowrap">טלפון</TableHead>
-              <TableHead className="whitespace-nowrap">חברה</TableHead>
+              <TableHead className="hidden sm:table-cell whitespace-nowrap">חברה</TableHead>
+              <TableHead className="whitespace-nowrap">מספרי רכב</TableHead>
               <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
             </TableRow>
           </TableHeader>
@@ -201,7 +227,8 @@ export function ContactsManager() {
                 <TableCell className="whitespace-nowrap">{c.lastName}</TableCell>
                 <TableCell className="whitespace-nowrap font-mono">{c.idNumber}</TableCell>
                 <TableCell className="whitespace-nowrap font-mono" dir="ltr">{c.phone}</TableCell>
-                <TableCell className="whitespace-nowrap">{c.company}</TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap">{c.company}</TableCell>
+                <TableCell className="whitespace-nowrap">{c.carNumbers.join("; ")}</TableCell>
                 <TableCell className="whitespace-nowrap text-end">
                   <div className="flex justify-end gap-1">
                     <Button size="icon" variant="ghost" onClick={() => setEditing(c)}>
@@ -223,7 +250,7 @@ export function ContactsManager() {
             ))}
             {!filtered.length && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
                   אין אנשי קשר
                 </TableCell>
               </TableRow>
@@ -243,7 +270,13 @@ export function ContactsManager() {
               <Field label="שם משפחה" value={editing.lastName} onChange={(v) => setEditing({ ...editing, lastName: v })} />
               <Field label="ת.ז." value={editing.idNumber} onChange={(v) => setEditing({ ...editing, idNumber: v })} />
               <Field label="טלפון" value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} />
-              <Field label="חברה" value={editing.company} onChange={(v) => setEditing({ ...editing, company: v })} className="sm:col-span-2" />
+              <Field label="חברה" value={editing.company} onChange={(v) => setEditing({ ...editing, company: v })} />
+              <Field
+                label="מספרי רכב"
+                value={editing.carNumbers.join(", ")}
+                onChange={(v) => setEditing({ ...editing, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
+                className="sm:col-span-2"
+              />
             </div>
           )}
           <DialogFooter>

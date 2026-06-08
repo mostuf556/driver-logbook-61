@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Bug, Menu, X } from "lucide-react";
+import { Bug, ExternalLink, Globe, Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,7 +17,7 @@ const NAV_ITEMS = [
 ] as const;
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { settings } = useAppData();
+  const { settings, updateSettings } = useAppData();
   useTheme(settings.theme);
   const debug = useDebugMode();
   const navigate = useNavigate();
@@ -34,13 +34,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [debug]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    document.documentElement.lang = settings.direction === "rtl" ? "he" : "en";
+    document.documentElement.dir = settings.direction;
+  }, [settings.direction]);
+
   // Close mobile menu on navigate
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground" dir="rtl">
+    <div className="min-h-screen bg-background text-foreground" dir={settings.direction}>
       <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-4">
           {/* Logo */}
@@ -60,6 +66,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <NavLink key={item.to} to={item.to}>{item.label}</NavLink>
             ))}
 
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={settings.direction === "rtl" ? "Switch to English" : "Switch to Hebrew"}
+              className="ms-1"
+              onClick={() => updateSettings({ ...settings, direction: settings.direction === "rtl" ? "ltr" : "rtl" })}
+            >
+              <Globe />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Report bug"
+              className="ms-1"
+              onClick={() => window.open("https://github.com/mostuf556/driver-logbook-61/issues", "_blank")}
+            >
+              <ExternalLink />
+            </Button>
             {(settings.showDebugToggle || debug) && (
               <Button
                 variant={debug ? "default" : "ghost"}
@@ -102,6 +126,26 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   {item.label}
                 </MobileNavLink>
               ))}
+              <button
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
+                onClick={() => {
+                  updateSettings({ ...settings, direction: settings.direction === "rtl" ? "ltr" : "rtl" });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <Globe className="size-4" />
+                {settings.direction === "rtl" ? "English" : "עברית"}
+              </button>
+              <button
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
+                onClick={() => {
+                  window.open("https://github.com/mostuf556/driver-logbook-61/issues", "_blank");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <ExternalLink className="size-4" />
+                דו"ח בעיה
+              </button>
               {(settings.showDebugToggle || debug) && (
                 <button
                   className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"

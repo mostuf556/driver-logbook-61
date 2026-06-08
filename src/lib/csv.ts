@@ -1,7 +1,7 @@
 import { DEFAULT_CSV_COLUMNS } from "./defaults";
 import { computeTotalMinutes, filenameDate, formatDate, formatTotal, todayISO } from "./time";
 import { uid } from "./storage";
-import type { AppSettings, CsvColumnKey, DriverReport } from "./types";
+import type { AppSettings, Contact, CsvColumnKey, DriverReport } from "./types";
 
 /** Parse one CSV line respecting quoted fields and Excel ="value" formula syntax. */
 export function parseCsvLine(line: string, delim: string): string[] {
@@ -194,12 +194,12 @@ export function importReportsCsv(text: string): DriverReport[] {
   return records;
 }
 
-export function exportContactsCsv(  contacts: { firstName: string; lastName: string; idNumber: string; phone: string; company: string }[],
+export function exportContactsCsv(  contacts: Contact[],
   s: AppSettings,
 ) {
   const delim = s.csvDelimiter;
   const includeBom = s.csvIncludeBom;
-  const header = ["שם פרטי", "שם משפחה", "תעודת זהות", "טלפון", "חברה"];
+  const header = ["שם פרטי", "שם משפחה", "תעודת זהות", "טלפון", "חברה", "מספרי רכב"];
   const lines = [header.map((h) => escapeCell(h, delim)).join(delim)];
   for (const c of contacts) {
     lines.push(
@@ -209,6 +209,7 @@ export function exportContactsCsv(  contacts: { firstName: string; lastName: str
         c.idNumber,
         s.csvQuotePhone && c.phone ? `="${c.phone}"` : c.phone,
         c.company,
+        c.carNumbers?.join("; ") ?? "",
       ]
         .map((v) => escapeCell(v, delim))
         .join(delim),

@@ -40,6 +40,7 @@ const CONTACT_FIELD_OPTIONS = [
   { key: "idNumber" as const, label: "ת.ז." },
   { key: "phone" as const, label: "טלפון" },
   { key: "company" as const, label: "חברה" },
+  { key: "carNumbers" as const, label: "מספרי רכב" },
 ];
 
 export function SettingsForm() {
