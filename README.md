@@ -88,6 +88,7 @@ src/
 
 
 ## Todos
+- allow config required fields on the app settings page. by default dont enforce a required field
 - /home: fast search shouldn't be restricted to car license field
 - on mobile view: try to avoid showing horizontal scroll 
 - allow to switch between english and hebrew from headers menu
