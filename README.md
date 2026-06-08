@@ -88,10 +88,14 @@ src/
 
 
 ## Todos
-
-
+- /home: fast search shouldn't be restricted to car license field
+- on mobile view: try to avoid showing horizontal scroll 
+- allow to switch between english and hebrew from headers menu
 - regex validation update: allow using char: "-" on fields: phone number, car licenses
 - form: all fields should be aligned to the right if RTL language mode is activated (also phone number)
 - a contact may have multiple car licenses
 - a contact should contain a car license option
-- add link to github issues in order to easily report bugs
+- add link to github issues in order to easily report bugs: https://github.com/mostuf556/driver-logbook-61/issues
+- on cars which are not yet existed - avoid presenting the fields:
+"יציאה"
+"סהכ זמן"
