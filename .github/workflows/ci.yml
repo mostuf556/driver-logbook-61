@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report
+          path: public/e2e-report
           retention-days: 14
 
       - name: Upload Playwright videos & traces
@@ -74,5 +74,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-videos
-          path: test-results
+          path: public/e2e-results
           retention-days: 14
