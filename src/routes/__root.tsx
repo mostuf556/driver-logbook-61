@@ -87,8 +87,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
       { name: "twitter:description", content: "Driver Logbook is a web application for managing driver reports and vehicle entries." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/68c0a5c3-1514-413e-ba9a-fbdf2cd5c577/id-preview-8d090c7e--ddc02bf4-c4d8-459a-8e6a-076d16b0c196.lovable.app-1780867471653.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/68c0a5c3-1514-413e-ba9a-fbdf2cd5c577/id-preview-8d090c7e--ddc02bf4-c4d8-459a-8e6a-076d16b0c196.lovable.app-1780867471653.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp" },
     ],
     links: [
       {
