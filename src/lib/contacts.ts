@@ -45,7 +45,7 @@ export function upsertContactFromReport(
         merged.carNumbers = Array.from(new Set([...(merged.carNumbers || []), ...candidate.carNumbers]));
         return;
       }
-      (merged as Record<string, string>)[k] = v as string;
+      (merged as unknown as Record<string, unknown>)[k] = v;
     });
     const next = [...contacts];
     next[idx] = merged;

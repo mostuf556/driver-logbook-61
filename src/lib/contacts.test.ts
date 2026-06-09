@@ -19,10 +19,10 @@ describe("autocomplete suggestions", () => {
 
     const settings = {
       ...DEFAULT_SETTINGS,
-      autocompleteFields: ["carNumber"],
+      autocompleteFields: ["carNumber"] as const,
       matchMode: "prefix",
       caseSensitive: false,
-    };
+    } as any;
 
     const suggestions = getSuggestions("carNumber", "ABC", contacts, settings);
 
@@ -54,10 +54,10 @@ describe("autocomplete suggestions", () => {
 
     const settings = {
       ...DEFAULT_SETTINGS,
-      autocompleteFields: ["carNumber"],
+      autocompleteFields: ["carNumber"] as const,
       matchMode: "substring",
       caseSensitive: false,
-    };
+    } as any;
 
     const suggestions = getSuggestions("carNumber", "SAME123", contacts, settings);
 
