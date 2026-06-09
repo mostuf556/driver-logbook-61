@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as E2eRouteImport } from './routes/e2e'
 import { Route as CoverageRouteImport } from './routes/coverage'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -31,6 +32,11 @@ const LogsRoute = LogsRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const E2eRoute = E2eRouteImport.update({
+  id: '/e2e',
+  path: '/e2e',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoverageRoute = CoverageRouteImport.update({
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
+  '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
+  '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
+  '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/coverage'
+    | '/e2e'
     | '/home'
     | '/logs'
     | '/settings'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/coverage'
+    | '/e2e'
     | '/home'
     | '/logs'
     | '/settings'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contacts'
     | '/coverage'
+    | '/e2e'
     | '/home'
     | '/logs'
     | '/settings'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactsRoute: typeof ContactsRoute
   CoverageRoute: typeof CoverageRoute
+  E2eRoute: typeof E2eRoute
   HomeRoute: typeof HomeRoute
   LogsRoute: typeof LogsRoute
   SettingsRoute: typeof SettingsRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/e2e': {
+      id: '/e2e'
+      path: '/e2e'
+      fullPath: '/e2e'
+      preLoaderRoute: typeof E2eRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coverage': {
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRoute,
   CoverageRoute: CoverageRoute,
+  E2eRoute: E2eRoute,
   HomeRoute: HomeRoute,
   LogsRoute: LogsRoute,
   SettingsRoute: SettingsRoute,
