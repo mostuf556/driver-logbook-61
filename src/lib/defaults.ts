@@ -42,7 +42,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   liveOnSiteBadge: true,
 
   phoneMinLength: 9,
-  phoneMaxLength: 10,
+  phoneMaxLength: 15,
   phoneAllowedPrefixes: "0,+972",
   idNumberLength: 9,
   validateIsraeliId: false,

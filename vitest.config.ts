@@ -12,6 +12,10 @@ export default defineConfig({
         find: '@lovable.dev/vite-tanstack-config',
         replacement: path.resolve(__dirname, 'test/vite-tanstack-config-mock.js'),
       },
+      {
+        find: '@',
+        replacement: path.resolve(__dirname, 'src'),
+      },
     ],
   },
 })
