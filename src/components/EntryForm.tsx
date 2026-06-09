@@ -12,6 +12,7 @@ import { upsertContactFromReport } from "@/lib/contacts";
 import { randomReport } from "@/lib/debug-data";
 import { uid } from "@/lib/storage";
 import { nowHHMM, todayISO } from "@/lib/time";
+import { t } from "@/lib/i18n";
 import type { Contact, DriverReport } from "@/lib/types";
 import { validateCarNumber, validateIdNumber, validatePhone } from "@/lib/validation";
 
@@ -19,6 +20,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
   const { settings, reports, contacts, updateReports, updateContacts } = useAppData();
   const navigate = useNavigate();
   const debug = useDebugMode();
+  const lang = settings.language;
   const isEdit = !!existing;
 
   const [form, setForm] = useState<DriverReport>(
@@ -60,11 +62,11 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       validateIdNumber(form.idNumber, settings),
       validatePhone(form.phone, settings),
       validateCarNumber(form.carNumber, settings),
-      settings.requireApprover && !form.approverName ? "שם המאשר חובה" : null,
-      settings.requireGuard && !form.guardName ? "שם השומר חובה" : null,
-      !form.firstName && !form.lastName ? "שם נהג חובה" : null,
-      !form.date ? "תאריך חובה" : null,
-      !form.entryTime ? "שעת כניסה חובה" : null,
+      settings.requireApprover && !form.approverName ? t("approverRequired", lang) : null,
+      settings.requireGuard && !form.guardName ? t("guardRequired", lang) : null,
+      !form.firstName && !form.lastName ? t("driverNameRequired", lang) : null,
+      !form.date ? t("dateRequired", lang) : null,
+      !form.entryTime ? t("entryTimeRequired", lang) : null,
     ].filter(Boolean) as string[];
     if (errs.length) {
       toast.error(errs[0]);
@@ -76,7 +78,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       : [next, ...reports];
     updateReports(list);
     updateContacts(upsertContactFromReport(contacts, next, settings));
-    toast.success(isEdit ? "עודכן" : "נוסף");
+    toast.success(isEdit ? t("reportUpdated", lang) : t("reportSaved", lang));
     navigate({ to: "/home" });
   };
 
@@ -85,16 +87,16 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       {debug && !isEdit && (
         <div className="sm:col-span-2">
           <Button type="button" variant="outline" size="sm" onClick={() => setForm(randomReport(settings))}>
-            מלא נתוני דמו
+            {t("demoData", lang)}
           </Button>
         </div>
       )}
       <div className="space-y-1.5">
-        <Label>תאריך</Label>
+        <Label>{t("date", lang)}</Label>
         <Input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label>חברה</Label>
+        <Label>{t("company", lang)}</Label>
         <FieldAutocomplete
           field="company"
           value={form.company}
@@ -105,7 +107,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>שם פרטי</Label>
+        <Label>{t("firstName", lang)}</Label>
         <FieldAutocomplete
           field="firstName"
           value={form.firstName}
@@ -116,7 +118,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>שם משפחה</Label>
+        <Label>{t("lastName", lang)}</Label>
         <FieldAutocomplete
           field="lastName"
           value={form.lastName}
@@ -127,7 +129,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>תעודת זהות</Label>
+        <Label>{t("idNumber", lang)}</Label>
         <FieldAutocomplete
           field="idNumber"
           value={form.idNumber}
@@ -139,7 +141,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>טלפון</Label>
+        <Label>{t("phone", lang)}</Label>
         <FieldAutocomplete
           field="phone"
           value={form.phone}
@@ -151,7 +153,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>מספר רכב</Label>
+        <Label>{t("carNumber", lang)}</Label>
         <div className="flex gap-2">
           <Input value={form.carNumber} onChange={(e) => set("carNumber", e.target.value)} dir="ltr" />
           <PlateOcrDialog
@@ -162,11 +164,11 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label>שעת כניסה</Label>
+        <Label>{t("entryTime", lang)}</Label>
         <Input type="time" value={form.entryTime} onChange={(e) => set("entryTime", e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label>שעת יציאה</Label>
+        <Label>{t("exitTime", lang)}</Label>
         <Input
           type="time"
           value={form.exitTime ?? ""}
@@ -174,18 +176,18 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label>שם המאשר</Label>
+        <Label>{t("approverName", lang)}</Label>
         <Input value={form.approverName} onChange={(e) => set("approverName", e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label>שם השומר</Label>
+        <Label>{t("guardName", lang)}</Label>
         <Input value={form.guardName} onChange={(e) => set("guardName", e.target.value)} />
       </div>
       <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={() => navigate({ to: "/home" })}>
-          ביטול
+          {t("cancel", lang)}
         </Button>
-        <Button type="submit">{isEdit ? "שמור" : "הוסף רשומה"}</Button>
+        <Button type="submit">{isEdit ? t("save", lang) : t("addNewEntry", lang)}</Button>
       </div>
     </form>
   );

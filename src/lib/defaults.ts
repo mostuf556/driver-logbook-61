@@ -17,6 +17,7 @@ export const DEFAULT_CSV_COLUMNS: CsvColumn[] = [
 
 export const DEFAULT_SETTINGS: AppSettings = {
   direction: "rtl",
+  language: "he",
   theme: "light",
   dateFormat: "dd/mm/yyyy",
   timeFormat: "HH:mm",

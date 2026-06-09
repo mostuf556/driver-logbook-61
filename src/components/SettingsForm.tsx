@@ -23,7 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppData } from "@/hooks/use-app-data";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { clearAll, exportAllJson, importAllJson } from "@/lib/storage";
-import { clearTokenLog, loadTokenLog, totalTokensUsed, type TokenLogEntry } from "@/lib/openrouter";
+import { checkOpenRouterKeyAvailability, clearTokenLog, loadTokenLog, totalTokensUsed, type TokenLogEntry } from "@/lib/openrouter";
+import { t } from "@/lib/i18n";
 import type { AppSettings, AutocompleteField } from "@/lib/types";
 
 const AUTOCOMPLETE_FIELD_OPTIONS: { key: AutocompleteField; label: string }[] = [
@@ -46,21 +47,24 @@ const CONTACT_FIELD_OPTIONS = [
 export function SettingsForm() {
   const { settings, updateSettings } = useAppData();
   const [s, setS] = useState<AppSettings>(settings);
+  const [keyStatus, setKeyStatus] = useState<string | null>(null);
+  const [checkingKey, setCheckingKey] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const lang = s.language;
 
   const set = <K extends keyof AppSettings>(k: K, v: AppSettings[K]) =>
     setS((prev) => ({ ...prev, [k]: v }));
 
   const save = () => {
     updateSettings(s);
-    toast.success("ההגדרות נשמרו");
+    toast.success(t("settingsSaved", lang));
   };
 
   const reset = () => {
-    if (!confirm("לאפס את כל ההגדרות לברירת מחדל?")) return;
+    if (!confirm(t("confirmResetSettings", lang))) return;
     setS(DEFAULT_SETTINGS);
     updateSettings(DEFAULT_SETTINGS);
-    toast.success("אופס");
+    toast.success(t("resetSettingsSuccess", lang));
   };
 
   const exportData = () => {
@@ -75,10 +79,31 @@ export function SettingsForm() {
   const importData = async (file: File) => {
     try {
       importAllJson(await file.text());
-      toast.success("יובא בהצלחה — רענן את הדף");
+      toast.success(t("importSuccessRefresh", lang));
       setTimeout(() => location.reload(), 500);
     } catch {
-      toast.error("קובץ לא תקין");
+      toast.error(t("invalidImportFile", lang));
+    }
+  };
+
+  const checkKeyAvailability = async () => {
+    if (!s.openRouterApiKey && !(s.openRouterApiKeys?.filter(Boolean).length)) {
+      toast.error(t("openRouterKeyRequired", lang));
+      return;
+    }
+
+    setCheckingKey(true);
+    setKeyStatus(null);
+    try {
+      await checkOpenRouterKeyAvailability(s);
+      setKeyStatus(t("keyStatusAvailable", s.language));
+      toast.success(t("keyStatusAvailable", s.language));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t("keyCheckError", s.language);
+      setKeyStatus(`${t("keyStatusUnavailable", s.language)}: ${message}`);
+      toast.error(message);
+    } finally {
+      setCheckingKey(false);
     }
   };
 
@@ -104,6 +129,22 @@ export function SettingsForm() {
                 <SelectContent>
                   <SelectItem value="rtl">RTL (עברית)</SelectItem>
                   <SelectItem value="ltr">LTR</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="שפה">
+              <Select
+                value={s.language}
+                onValueChange={(v) => {
+                  const language = v as AppSettings["language"];
+                  set("language", language);
+                  set("direction", language === "en" ? "ltr" : "rtl");
+                }}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="he">עברית</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -406,6 +447,26 @@ export function SettingsForm() {
               <p className="mt-1 text-xs text-muted-foreground">
                 בשימוש רק אם אין מפתחות ברשימה למעלה. נשמר מקומית בדפדפן זה בלבד.
               </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {((s.openRouterApiKeys ?? []).filter(Boolean).length === 0 && !s.openRouterApiKey) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://openrouter.ai/workspaces/default/keys", "_blank")}
+                  >
+                    {t("generateNewKey", lang)}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={checkKeyAvailability}
+                  disabled={checkingKey || !s.openRouterApiKey && !(s.openRouterApiKeys?.filter(Boolean).length)}
+                >
+                  {checkingKey ? t("checkingKey", lang) : t("checkKey", lang)}
+                </Button>
+              </div>
+              {keyStatus && <p className="mt-2 text-xs text-muted-foreground">{keyStatus}</p>}
             </Field>
 
             <Field label="Base URL">
@@ -463,14 +524,16 @@ export function SettingsForm() {
       </Accordion>
 
       <div className="sticky bottom-0 flex justify-end gap-2 border-t bg-background pt-3">
-        <Button variant="outline" onClick={reset}>אפס לברירת מחדל</Button>
-        <Button onClick={save}>שמור הגדרות</Button>
+        <Button variant="outline" onClick={reset}>{t("resetDefaults", lang)}</Button>
+        <Button onClick={save}>{t("saveSettings", lang)}</Button>
       </div>
     </div>
   );
 }
 
 function TokenUsageWidget() {
+  const { settings } = useAppData();
+  const lang = settings.language;
   const [log, setLog] = useState<TokenLogEntry[]>([]);
   const [total, setTotal] = useState(0);
 
@@ -486,16 +549,16 @@ function TokenUsageWidget() {
     clearTokenLog();
     setLog([]);
     setTotal(0);
-    toast.success("לוג טוקנים נוקה");
+    toast.success(t("tokenLogCleared", lang));
   };
 
   return (
     <div className="rounded border p-3 space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">שימוש בטוקנים (OpenRouter)</span>
+        <span className="text-sm font-medium">{t("tokenUsage", lang)}</span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">סה״כ: {total.toLocaleString()}</span>
-          <Button variant="outline" size="sm" onClick={handleClear} disabled={log.length === 0}>נקה לוג</Button>
+          <span className="text-xs text-muted-foreground">{t("totalTokens", lang)}: {total.toLocaleString()}</span>
+          <Button variant="outline" size="sm" onClick={handleClear} disabled={log.length === 0}>{t("clearLog", lang)}</Button>
         </div>
       </div>
       {log.length === 0 ? (

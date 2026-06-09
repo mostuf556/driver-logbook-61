@@ -65,6 +65,7 @@ export interface CsvColumn {
 export interface AppSettings {
   // General
   direction: "rtl" | "ltr";
+  language: "he" | "en";
   theme: "light" | "dark" | "blue" | "green" | "warm" | "system";
   dateFormat: "dd/mm/yyyy" | "yyyy-mm-dd" | "dd.mm.yyyy";
   timeFormat: "HH:mm" | "h:mm a";

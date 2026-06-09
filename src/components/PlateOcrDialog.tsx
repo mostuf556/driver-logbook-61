@@ -31,6 +31,7 @@ export function PlateOcrDialog({
   const [tokenInfo, setTokenInfo] = useState<{ prompt: number; completion: number } | null>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
+  const lang = settings.language;
 
   const handleFile = async (file: File) => {
     setLoading(true);
@@ -42,7 +43,7 @@ export function PlateOcrDialog({
       setPlate(result);
       if (usage) setTokenInfo({ prompt: usage.prompt_tokens, completion: usage.completion_tokens });
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "שגיאה בזיהוי");
+      toast.error(e instanceof Error ? e.message : t("ocrError", lang));
     } finally {
       setLoading(false);
     }
@@ -57,9 +58,9 @@ export function PlateOcrDialog({
 
   const openDialog = () => {
     if (!settings.openRouterApiKey && !(settings.openRouterApiKeys?.length)) {
-      toast.error("הוסף מפתח OpenRouter בהגדרות", {
+      toast.error(t("keyMissing", lang), {
         action: onNavigateToSettings
-          ? { label: "פתח הגדרות", onClick: onNavigateToSettings }
+          ? { label: t("openSettings", lang), onClick: onNavigateToSettings }
           : undefined,
       });
       return;
@@ -104,9 +105,9 @@ export function PlateOcrDialog({
 
       <DialogContent dir="rtl">
         <DialogHeader>
-          <DialogTitle>זיהוי מספר רכב מתמונה</DialogTitle>
+          <DialogTitle>{t("ocrDialogTitle", lang)}</DialogTitle>
           <DialogDescription>
-            צלם או העלה תמונה של לוחית הרכב. תקבל את הטקסט לאישור.
+            {t("ocrDialogDescription", lang)}
           </DialogDescription>
         </DialogHeader>
 
@@ -145,7 +146,7 @@ export function PlateOcrDialog({
               onClick={() => cameraRef.current?.click()}
             >
               <Camera className="size-4" />
-              פתח מצלמה
+              {t("openCamera", lang)}
             </Button>
             <Button
               type="button"
@@ -155,7 +156,7 @@ export function PlateOcrDialog({
               onClick={() => galleryRef.current?.click()}
             >
               <ImagePlus className="size-4" />
-              בחר מהגלריה
+              {t("chooseFromGallery", lang)}
             </Button>
           </div>
 
@@ -168,30 +169,30 @@ export function PlateOcrDialog({
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
-              מזהה...
+              {t("searchingText", lang)}
             </div>
           )}
 
           {tokenInfo && (
             <p className="text-xs text-muted-foreground">
-              טוקנים: {tokenInfo.prompt} קלט · {tokenInfo.completion} פלט
+              {t("ocrTokens", lang)}: {tokenInfo.prompt} prompt · {tokenInfo.completion} completion
             </p>
           )}
 
           <div>
-            <Label htmlFor="ocr-plate">מספר רכב</Label>
+            <Label htmlFor="ocr-plate">{t("licensePlate", lang)}</Label>
             <Input
               id="ocr-plate"
               value={plate}
               onChange={(e) => setPlate(e.target.value)}
-              placeholder="מספר רכב"
+              placeholder={t("licensePlate", lang)}
             />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            ביטול
+            {t("cancel", lang)}
           </Button>
           <Button
             disabled={!plate}
@@ -201,7 +202,7 @@ export function PlateOcrDialog({
               reset();
             }}
           >
-            אשר ומלא
+            {t("confirmAndFill", lang)}
           </Button>
         </DialogFooter>
       </DialogContent>

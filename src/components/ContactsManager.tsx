@@ -2,6 +2,7 @@ import { Pencil, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { t } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,6 +32,7 @@ const EMPTY: Contact = { id: "", firstName: "", lastName: "", idNumber: "", phon
 
 export function ContactsManager() {
   const { contacts, updateContacts, settings } = useAppData();
+  const lang = settings.language;
   const debug = useDebugMode();
   const [form, setForm] = useState<Contact>(EMPTY);
   const [editing, setEditing] = useState<Contact | null>(null);
@@ -40,24 +42,24 @@ export function ContactsManager() {
   const add = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.firstName && !form.lastName && !form.idNumber) {
-      toast.error("נדרש שם או ת.ז.");
+      toast.error(t("contactNameOrIdRequired", lang));
       return;
     }
     updateContacts([{ ...form, id: uid() }, ...contacts]);
     setForm(EMPTY);
-    toast.success("נוסף");
+    toast.success(t("contactAdded", lang));
   };
 
   const remove = (id: string) => {
     updateContacts(contacts.filter((c) => c.id !== id));
-    toast.success("נמחק");
+    toast.success(t("contactDeleted", lang));
   };
 
   const saveEdit = () => {
     if (!editing) return;
     updateContacts(contacts.map((c) => (c.id === editing.id ? editing : c)));
     setEditing(null);
-    toast.success("עודכן");
+    toast.success(t("contactUpdated", lang));
   };
 
   const importCsv = async (file: File) => {
@@ -134,9 +136,9 @@ export function ContactsManager() {
     }
     updateContacts([...added, ...contacts]);
     if (skipped > 0) {
-      toast.success(`יובאו ${added.length} אנשי קשר (${skipped} כפולות דולגו)`);
+      toast.success(`${added.length} ${t("contactImportSuccess", lang)} (${skipped} ${t("contactImportSkipped", lang)})`);
     } else {
-      toast.success(`יובאו ${added.length} אנשי קשר`);
+      toast.success(`${added.length} ${t("contactImportSuccess", lang)}`);
     }
   };
 
@@ -151,13 +153,13 @@ export function ContactsManager() {
   return (
     <div className="space-y-6">
       <form onSubmit={add} className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label="שם פרטי" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
-        <Field label="שם משפחה" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
-        <Field label="ת.ז." value={form.idNumber} onChange={(v) => setForm({ ...form, idNumber: v })} />
-        <Field label="טלפון" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-        <Field label="חברה" value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
+        <Field label={t("firstName", lang)} value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
+        <Field label={t("lastName", lang)} value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
+        <Field label={t("idNumber", lang)} value={form.idNumber} onChange={(v) => setForm({ ...form, idNumber: v })} />
+        <Field label={t("phone", lang)} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
+        <Field label={t("company", lang)} value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
         <Field
-          label="מספרי רכב"
+          label={t("carNumber", lang)}
           value={form.carNumbers.join(", ")}
           onChange={(v) => setForm({ ...form, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
           className="sm:col-span-2"
@@ -174,22 +176,22 @@ export function ContactsManager() {
                 setForm({ ...c, id: "" });
               }}
             >
-              דמו
+              {t("demoData", lang)}
             </Button>
           )}
-          <Button type="submit" className="w-full">הוסף איש קשר</Button>
+          <Button type="submit" className="w-full">{t("addContact", lang)}</Button>
         </div>
       </form>
 
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="חיפוש..."
+          placeholder={t("searchContactsPlaceholder", lang)}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-xs"
         />
         <Button variant="outline" onClick={() => exportContactsCsv(contacts, settings)}>
-          ייצוא CSV
+          {t("exportCsv", lang)}
         </Button>
         <input
           ref={fileRef}
@@ -203,7 +205,7 @@ export function ContactsManager() {
           }}
         />
         <Button variant="outline" onClick={() => fileRef.current?.click()}>
-          <Upload /> ייבוא CSV
+          <Upload /> {t("importCsv", lang)}
         </Button>
       </div>
 
@@ -211,13 +213,13 @@ export function ContactsManager() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="whitespace-nowrap">שם פרטי</TableHead>
-              <TableHead className="whitespace-nowrap">שם משפחה</TableHead>
-              <TableHead className="whitespace-nowrap">ת.ז.</TableHead>
-              <TableHead className="whitespace-nowrap">טלפון</TableHead>
-              <TableHead className="hidden sm:table-cell whitespace-nowrap">חברה</TableHead>
-              <TableHead className="whitespace-nowrap">מספרי רכב</TableHead>
-              <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
+              <TableHead className="whitespace-nowrap">{t("firstName", lang)}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("lastName", lang)}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("idNumber", lang)}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("phone", lang)}</TableHead>
+              <TableHead className="hidden sm:table-cell whitespace-nowrap">{t("company", lang)}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("carNumbers", lang)}</TableHead>
+              <TableHead className="whitespace-nowrap text-end">{t("actions", lang)}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -235,7 +237,7 @@ export function ContactsManager() {
                       <Pencil />
                     </Button>
                     <ConfirmDialog
-                      title="למחוק איש קשר?"
+                      title={t("deleteContact", lang)}
                       description={[c.firstName, c.lastName, c.idNumber].filter(Boolean).join(" · ")}
                       onConfirm={() => remove(c.id)}
                       trigger={
@@ -251,7 +253,7 @@ export function ContactsManager() {
             {!filtered.length && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
-                  אין אנשי קשר
+                  {t("noContacts", lang)}
                 </TableCell>
               </TableRow>
             )}
@@ -262,17 +264,17 @@ export function ContactsManager() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent dir="rtl" className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>עריכת איש קשר</DialogTitle>
+            <DialogTitle>{t("editContact", lang)}</DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="שם פרטי" value={editing.firstName} onChange={(v) => setEditing({ ...editing, firstName: v })} />
-              <Field label="שם משפחה" value={editing.lastName} onChange={(v) => setEditing({ ...editing, lastName: v })} />
-              <Field label="ת.ז." value={editing.idNumber} onChange={(v) => setEditing({ ...editing, idNumber: v })} />
-              <Field label="טלפון" value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} />
-              <Field label="חברה" value={editing.company} onChange={(v) => setEditing({ ...editing, company: v })} />
+              <Field label={t("firstName", lang)} value={editing.firstName} onChange={(v) => setEditing({ ...editing, firstName: v })} />
+              <Field label={t("lastName", lang)} value={editing.lastName} onChange={(v) => setEditing({ ...editing, lastName: v })} />
+              <Field label={t("idNumber", lang)} value={editing.idNumber} onChange={(v) => setEditing({ ...editing, idNumber: v })} />
+              <Field label={t("phone", lang)} value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} />
+              <Field label={t("company", lang)} value={editing.company} onChange={(v) => setEditing({ ...editing, company: v })} />
               <Field
-                label="מספרי רכב"
+                label={t("carNumber", lang)}
                 value={editing.carNumbers.join(", ")}
                 onChange={(v) => setEditing({ ...editing, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
                 className="sm:col-span-2"
@@ -280,8 +282,8 @@ export function ContactsManager() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>ביטול</Button>
-            <Button onClick={saveEdit}>שמור</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>{t("cancel", lang)}</Button>
+            <Button onClick={saveEdit}>{t("save", lang)}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

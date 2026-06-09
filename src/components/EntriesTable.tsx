@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { t } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ export function EntriesTable({
   hideExitColumns?: boolean;
 }) {
   const { settings, reports, updateReports } = useAppData();
+  const lang = settings.language;
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -48,12 +50,12 @@ export function EntriesTable({
         : x,
     );
     updateReports(next);
-    toast.success("יציאה נרשמה");
+    toast.success(t("exitRecorded", lang));
   };
 
   const onDelete = (r: DriverReport) => {
     updateReports(reports.filter((x) => x.id !== r.id));
-    toast.success("נמחק");
+    toast.success(t("recordDeleted", lang));
   };
 
   const hideExit = hideExitColumns ?? rows.every((r) => !r.exitTime);
@@ -67,14 +69,14 @@ export function EntriesTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="whitespace-nowrap">תאריך</TableHead>
-            <TableHead className="whitespace-nowrap">שם נהג</TableHead>
-            <TableHead className="hidden sm:table-cell whitespace-nowrap">חברה</TableHead>
-            <TableHead className="whitespace-nowrap">מספר רכב</TableHead>
-            <TableHead className="whitespace-nowrap">כניסה</TableHead>
-            {!hideExit && <TableHead className="whitespace-nowrap">יציאה</TableHead>}
-            {!hideExit && <TableHead className="whitespace-nowrap">סהכ זמן</TableHead>}
-            <TableHead className="whitespace-nowrap text-end">פעולות</TableHead>
+            <TableHead className="whitespace-nowrap">{t("date", settings.language)}</TableHead>
+            <TableHead className="whitespace-nowrap">{t("driverName", settings.language)}</TableHead>
+            <TableHead className="hidden sm:table-cell whitespace-nowrap">{t("company", settings.language)}</TableHead>
+            <TableHead className="whitespace-nowrap">{t("carNumber", settings.language)}</TableHead>
+            <TableHead className="whitespace-nowrap">{t("entryTime", settings.language)}</TableHead>
+            {!hideExit && <TableHead className="whitespace-nowrap">{t("exitTime", settings.language)}</TableHead>}
+            {!hideExit && <TableHead className="whitespace-nowrap">{t("totalTime", settings.language)}</TableHead>}
+            <TableHead className="whitespace-nowrap text-end">{t("actions", settings.language)}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -96,9 +98,9 @@ export function EntriesTable({
                   <TableCell className="whitespace-nowrap">
                     {r.exitTime ?? (
                       settings.liveOnSiteBadge ? (
-                        <Badge variant="secondary">בפנים · {formatTotal(live)}</Badge>
+                        <Badge variant="secondary">{t("insideWithTime", lang)} {formatTotal(live)}</Badge>
                       ) : (
-                        <Badge variant="secondary">בפנים</Badge>
+                        <Badge variant="secondary">{t("inside", lang)}</Badge>
                       )
                     )}
                   </TableCell>
@@ -108,7 +110,7 @@ export function EntriesTable({
                   <div className="flex justify-end gap-1">
                     {showLeave && !r.exitTime && (
                       <Button size="sm" onClick={() => onLeave(r)}>
-                        יצא
+                        {t("leave", lang)}
                       </Button>
                     )}
                     <Button asChild size="icon" variant="ghost">
@@ -117,8 +119,10 @@ export function EntriesTable({
                       </Link>
                     </Button>
                     <ConfirmDialog
-                      title="למחוק רשומה זו?"
+                      title={t("confirmDeleteRecord", lang)}
                       description={`${fullName || ""} · ${r.carNumber}`}
+                      confirmLabel={t("delete", lang)}
+                      cancelLabel={t("cancel", lang)}
                       onConfirm={() => onDelete(r)}
                       trigger={
                         <Button size="icon" variant="ghost">

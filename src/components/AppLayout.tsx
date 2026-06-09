@@ -8,13 +8,7 @@ import { useAppData } from "@/hooks/use-app-data";
 import { useDebugMode, setDebugFlag } from "@/hooks/use-debug-mode";
 import { useTheme } from "@/hooks/use-theme";
 import { installErrorListeners } from "@/lib/error-log";
-
-const NAV_ITEMS = [
-  { to: "/home", label: "כניסות" },
-  { to: "/contacts", label: "אנשי קשר" },
-  { to: "/logs", label: "לוגים" },
-  { to: "/settings", label: "הגדרות" },
-] as const;
+import { t } from "@/lib/i18n";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { settings, updateSettings } = useAppData();
@@ -22,6 +16,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const debug = useDebugMode();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navItems = [
+    { to: "/home", label: t("navEntries", settings.language) },
+    { to: "/contacts", label: t("navContacts", settings.language) },
+    { to: "/logs", label: t("navLogs", settings.language) },
+    { to: "/settings", label: t("navSettings", settings.language) },
+  ] as const;
 
   useEffect(() => {
     installErrorListeners();
@@ -36,9 +36,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    document.documentElement.lang = settings.direction === "rtl" ? "he" : "en";
+    document.documentElement.lang = settings.language;
     document.documentElement.dir = settings.direction;
-  }, [settings.direction]);
+  }, [settings.direction, settings.language]);
 
   // Close mobile menu on navigate
   useEffect(() => {
@@ -57,21 +57,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold select-none">
               נ
             </span>
-            <span className="hidden sm:inline">דוח נהגים</span>
+            <span className="hidden sm:inline">{t("title", settings.language)}</span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-0.5 text-sm">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavLink key={item.to} to={item.to}>{item.label}</NavLink>
             ))}
 
             <Button
               variant="ghost"
               size="icon"
-              aria-label={settings.direction === "rtl" ? "Switch to English" : "Switch to Hebrew"}
+              aria-label={t("toggleLanguage", settings.language)}
               className="ms-1"
-              onClick={() => updateSettings({ ...settings, direction: settings.direction === "rtl" ? "ltr" : "rtl" })}
+              onClick={() => {
+                const nextLanguage = settings.language === "he" ? "en" : "he";
+                updateSettings({ ...settings, language: nextLanguage, direction: nextLanguage === "en" ? "ltr" : "rtl" });
+              }}
             >
               <Globe />
             </Button>
@@ -117,7 +120,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {mobileMenuOpen && (
           <div className="md:hidden border-t bg-card/98 backdrop-blur-sm">
             <nav className="container mx-auto flex flex-col px-4 py-2 gap-0.5">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <MobileNavLink
                   key={item.to}
                   to={item.to}
@@ -129,12 +132,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <button
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
                 onClick={() => {
-                  updateSettings({ ...settings, direction: settings.direction === "rtl" ? "ltr" : "rtl" });
+                  const nextLanguage = settings.language === "he" ? "en" : "he";
+                  updateSettings({ ...settings, language: nextLanguage, direction: nextLanguage === "en" ? "ltr" : "rtl" });
                   setMobileMenuOpen(false);
                 }}
               >
                 <Globe className="size-4" />
-                {settings.direction === "rtl" ? "English" : "עברית"}
+                {settings.language === "he" ? "English" : "עברית"}
               </button>
               <button
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
@@ -144,7 +148,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 }}
               >
                 <ExternalLink className="size-4" />
-                דו"ח בעיה
+                {t("reportBug", settings.language)}
               </button>
               {(settings.showDebugToggle || debug) && (
                 <button
