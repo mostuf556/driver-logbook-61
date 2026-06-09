@@ -31,3 +31,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# vitest coverage output (served at /coverage)
+public/coverage/
