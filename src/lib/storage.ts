@@ -4,7 +4,7 @@ import type { AppSettings, Contact, DriverReport, PendingImage } from "./types";
 type LegacyDriver = Partial<DriverReport> & { driverName?: string };
 type LegacyContact = Partial<Contact> & { driverName?: string };
 
-function splitName(name: string): { firstName: string; lastName: string } {
+export function splitName(name: string): { firstName: string; lastName: string } {
   const t = (name || "").trim();
   if (!t) return { firstName: "", lastName: "" };
   const i = t.indexOf(" ");
@@ -12,7 +12,7 @@ function splitName(name: string): { firstName: string; lastName: string } {
   return { firstName: t.slice(0, i), lastName: t.slice(i + 1).trim() };
 }
 
-function migrateReport(r: LegacyDriver): DriverReport {
+export function migrateReport(r: LegacyDriver): DriverReport {
   if (r.firstName === undefined && r.lastName === undefined && r.driverName !== undefined) {
     const { firstName, lastName } = splitName(r.driverName);
     return { ...(r as DriverReport), firstName, lastName };
@@ -21,7 +21,7 @@ function migrateReport(r: LegacyDriver): DriverReport {
   return { ...base, firstName: r.firstName ?? "", lastName: r.lastName ?? "" };
 }
 
-function migrateContact(c: LegacyContact): Contact {
+export function migrateContact(c: LegacyContact): Contact {
   if (c.firstName === undefined && c.lastName === undefined && c.driverName !== undefined) {
     const { firstName, lastName } = splitName(c.driverName);
     return { ...(c as Contact), firstName, lastName, carNumbers: c.carNumbers ?? [] };

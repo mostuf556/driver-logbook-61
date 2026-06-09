@@ -49,6 +49,8 @@ Summary: automated unit tests exist for autocomplete features. The remaining imp
 Update (tests added):
 - Unit tests added for `PaperOcrDialog` parsing and normalization: `src/components/paperOcr.test.ts`.
 - Unit tests added for validation helpers: `src/lib/validation.test.ts`.
+- Unit tests added for contact upsert and fullname: `src/lib/contacts.test.ts` (extended).
+- Unit tests added for storage migration helpers: `src/lib/storage.test.ts`.
 
 Estimated coverage impact:
 - These new unit tests exercise parsing, normalization, and validation logic across multiple modules and should raise overall test coverage substantially. Based on typical LOC weighting, I estimate coverage will exceed 50% after running the suite.

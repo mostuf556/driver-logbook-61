@@ -11,7 +11,7 @@ describe("validation helpers", () => {
 
   it("validatePhone rejects short numbers", () => {
     const s = { ...DEFAULT_SETTINGS, phoneMinLength: 5 };
-    expect(validatePhone("123", s)).toMatch(/short/i);
+    expect(validatePhone("123", s)).toMatch(/קצר/);
   });
 
   it("validateIdNumber checks length and checksum", () => {
