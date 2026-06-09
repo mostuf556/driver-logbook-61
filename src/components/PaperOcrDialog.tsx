@@ -27,11 +27,12 @@ function normalizeValue(value: string) {
 
 function normalizeDate(value: string) {
   const cleaned = value.replace(/\./g, "-").replace(/\//g, "-").trim();
-  if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(cleaned)) return cleaned;
-  const parts = cleaned.split("-").map((p) => p.padStart(2, "0"));
+  const parts = cleaned.split("-");
   if (parts.length === 3) {
-    if (parts[0].length === 4) return `${parts[0]}-${parts[1]}-${parts[2]}`;
-    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    if (parts[0].length === 4) {
+      return `${parts[0]}-${parts[1].padStart(2, "0")}-${parts[2].padStart(2, "0")}`;
+    }
+    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
   }
   return todayISO();
 }
