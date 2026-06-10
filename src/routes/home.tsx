@@ -24,8 +24,8 @@ import { normalizePlate } from "@/lib/validation";
 export const Route = createFileRoute("/home")({
   head: () => ({
     meta: [
-      { title: "דוח כניסות ויציאות" },
-      { name: "description", content: "ניהול דוח נהגים בשער עם ייצוא CSV" },
+      { title: "Driver entry report" },
+      { name: "description", content: "Manage driver entries and exits with CSV export" },
     ],
   }),
   component: HomePage,
@@ -128,9 +128,9 @@ function HomePage() {
             if (csvImportRef.current) csvImportRef.current.value = "";
           }}
         />
-        <div className="flex flex-wrap items-center justify-between gap-3" dir="rtl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">{t("homeTitle", lang)}</h1>
+            <h1 className="text-2xl font-bold">{t("pageHomeHeading", lang)}</h1>
             <p className="text-sm text-muted-foreground">
               {open.length} {t("todayOpenCount", lang)} · {todayClosed.length} {t("todayClosedCount", lang)}
             </p>
@@ -189,7 +189,7 @@ function HomePage() {
           </TooltipProvider>
         </div>
 
-        <section className="space-y-2" dir="rtl">
+        <section className="space-y-2">
           <h2 className="text-lg font-semibold">{t("quickSearch", lang)}</h2>
           <Input
             placeholder={t("searchPlaceholder", lang)}
