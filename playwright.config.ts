@@ -5,8 +5,9 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
-  retries: process.env.CI ? 1 : 0,
+  fullyParallel: false,
+  workers: 1,
+  retries: 0,
   reporter: [
     ["list"],
     ["html", { outputFolder: "public/e2e-report", open: "never" }],
@@ -15,9 +16,13 @@ export default defineConfig({
   outputDir: "public/e2e-results",
   use: {
     baseURL,
-    trace: "on-first-retry",
-    video: "on",
+    trace: "retain-on-failure",
+    video: {
+      mode: "on",
+      size: { width: 1280, height: 720 },
+    },
     screenshot: "only-on-failure",
+    viewport: { width: 1280, height: 720 },
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
