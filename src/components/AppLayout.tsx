@@ -81,7 +81,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Report bug"
+              aria-label={t("reportBug", settings.language)}
               className="ms-1"
               onClick={() => window.open("https://github.com/mostuf556/driver-logbook-61/issues", "_blank")}
             >
@@ -91,7 +91,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Button
                 variant={debug ? "default" : "ghost"}
                 size="icon"
-                aria-label="מצב דיבאג"
+                aria-label={t("debug", settings.language)}
                 className="ms-1"
                 onClick={() => setDebugFlag(!debug)}
               >
@@ -108,7 +108,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="תפריט ניווט"
+              aria-label={t("navMenu", settings.language)}
               onClick={() => setMobileMenuOpen((o) => !o)}
             >
               {mobileMenuOpen ? <X /> : <Menu />}
@@ -156,7 +156,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   onClick={() => { setDebugFlag(!debug); setMobileMenuOpen(false); }}
                 >
                   <Bug className="size-4" />
-                  {debug ? "בטל דיבאג" : "מצב דיבאג"}
+                  {debug ? t("debugOff", settings.language) : t("debug", settings.language)}
                 </button>
               )}
             </nav>

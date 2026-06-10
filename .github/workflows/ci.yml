@@ -58,7 +58,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Ensure artifact directories exist
+        run: mkdir -p public/e2e-report public/e2e-results
+
       - name: Run e2e tests
+        continue-on-error: true
         run: npm run test:e2e
 
       - name: Upload Playwright HTML report
@@ -67,6 +71,7 @@ jobs:
         with:
           name: playwright-report
           path: public/e2e-report
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Upload Playwright videos & traces
@@ -75,4 +80,20 @@ jobs:
         with:
           name: playwright-videos
           path: public/e2e-results
+          if-no-files-found: warn
           retention-days: 14
+
+      - name: Fail job if e2e tests failed
+        if: always()
+        run: |
+          if [ -f public/e2e-results/index.json ]; then
+            status=$(node -e "console.log(require('./public/e2e-results/index.json').status)")
+            echo "E2E status: $status"
+            if [ "$status" != "passed" ]; then
+              echo "E2E tests did not pass (status=$status). See uploaded artifacts."
+              exit 1
+            fi
+          else
+            echo "No e2e manifest produced — treating as failure."
+            exit 1
+          fi
