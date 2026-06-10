@@ -65,6 +65,24 @@ jobs:
         continue-on-error: true
         run: npm run test:e2e
 
+      - name: E2E coverage summary
+        if: always()
+        run: |
+          if [ -f public/e2e-results/index.json ]; then
+            node -e "
+              const m = require('./public/e2e-results/index.json');
+              const total = m.tests.length;
+              const passed = m.tests.filter(t => t.status === 'passed').length;
+              const failed = m.tests.filter(t => t.status !== 'passed').length;
+              const pct = total ? Math.round((passed / total) * 100) : 0;
+              console.log('E2E coverage: ' + passed + '/' + total + ' passed (' + pct + '%)');
+              console.log('Failed: ' + failed);
+              for (const t of m.tests) console.log(' - [' + t.status + '] ' + t.title);
+            "
+          else
+            echo 'No e2e manifest produced.'
+          fi
+
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
