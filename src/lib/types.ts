@@ -135,6 +135,11 @@ export interface AppSettings {
   ocrRequireConfirmation: boolean;
   ocrMaxImageSizeMB: number;
 
+  // Paper OCR (multi-row table import)
+  paperOcrColumns: string[];
+  paperPhoneSeparator: string;
+  paperOcrPrompt: string;
+
   // Storage
   storageNamespace: string;
 
