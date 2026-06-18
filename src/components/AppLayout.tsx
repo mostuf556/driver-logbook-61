@@ -16,6 +16,22 @@ import { useOpenRouterKeyStatus } from "@/hooks/use-openrouter-key-status";
 import { useTheme } from "@/hooks/use-theme";
 import { installErrorListeners } from "@/lib/error-log";
 import { t } from "@/lib/i18n";
+import type { KeyStatus } from "@/hooks/use-openrouter-key-status";
+
+function KeyStatusIcon({ status }: { status: KeyStatus }) {
+  if (status === "checking") {
+    return <Loader2 className="size-4 animate-spin text-muted-foreground" />;
+  }
+  const color =
+    status === "valid"
+      ? "text-green-600 dark:text-green-400"
+      : status === "invalid"
+        ? "text-red-600 dark:text-red-400"
+        : status === "missing"
+          ? "text-amber-600 dark:text-amber-400"
+          : "text-muted-foreground";
+  return <KeyRound className={`size-4 ${color}`} />;
+}
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { settings, updateSettings } = useAppData();
