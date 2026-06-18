@@ -1,11 +1,18 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Bug, ExternalLink, Globe, Menu, X } from "lucide-react";
+import { Bug, ExternalLink, Globe, KeyRound, Loader2, Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { useAppData } from "@/hooks/use-app-data";
 import { useDebugMode, setDebugFlag } from "@/hooks/use-debug-mode";
+import { useOpenRouterKeyStatus } from "@/hooks/use-openrouter-key-status";
 import { useTheme } from "@/hooks/use-theme";
 import { installErrorListeners } from "@/lib/error-log";
 import { t } from "@/lib/i18n";
@@ -14,6 +21,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { settings, updateSettings } = useAppData();
   useTheme(settings.theme);
   const debug = useDebugMode();
+  const keyStatus = useOpenRouterKeyStatus(settings);
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navItems = [
@@ -66,6 +74,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <NavLink key={item.to} to={item.to}>{item.label}</NavLink>
             ))}
 
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/settings"
+                    aria-label={t(`keyStatus_${keyStatus}`, settings.language)}
+                    className="ms-1 inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent/60"
+                  >
+                    <KeyStatusIcon status={keyStatus} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>{t(`keyStatus_${keyStatus}`, settings.language)}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <Button
               variant="ghost"
               size="icon"
@@ -104,6 +127,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
           {/* Mobile: theme + hamburger */}
           <div className="flex md:hidden items-center gap-1">
+            <Link
+              to="/settings"
+              aria-label={t(`keyStatus_${keyStatus}`, settings.language)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent/60"
+            >
+              <KeyStatusIcon status={keyStatus} />
+            </Link>
             <ThemeSwitcher />
             <Button
               variant="ghost"
