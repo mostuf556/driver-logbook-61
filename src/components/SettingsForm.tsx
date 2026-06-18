@@ -481,6 +481,35 @@ export function SettingsForm() {
             <NumField label="גודל תמונה מקס׳ (MB)" value={s.ocrMaxImageSizeMB} onChange={(n) => set("ocrMaxImageSizeMB", n)} />
             <Toggle label="מלא מספר רכב אוטומטית" checked={s.ocrAutoFillCarNumber} onCheckedChange={(v) => set("ocrAutoFillCarNumber", v)} />
             <Toggle label="חייב אישור משתמש" checked={s.ocrRequireConfirmation} onCheckedChange={(v) => set("ocrRequireConfirmation", v)} />
+
+            <Field label={t("paperOcrColumns", lang)} className="sm:col-span-2">
+              <div className="space-y-2">
+                {(s.paperOcrColumns ?? []).map((col, idx) => (
+                  <Input
+                    key={idx}
+                    value={col}
+                    onChange={(e) => {
+                      const next = [...(s.paperOcrColumns ?? [])];
+                      next[idx] = e.target.value;
+                      set("paperOcrColumns", next);
+                    }}
+                  />
+                ))}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{t("paperOcrColumnsHint", lang)}</p>
+            </Field>
+            <Field label={t("paperPhoneSeparator", lang)}>
+              <Input
+                value={s.paperPhoneSeparator}
+                onChange={(e) => set("paperPhoneSeparator", e.target.value)}
+                dir="ltr"
+              />
+            </Field>
+            <Field label={t("paperOcrPrompt", lang)} className="sm:col-span-2">
+              <Textarea value={s.paperOcrPrompt} onChange={(e) => set("paperOcrPrompt", e.target.value)} rows={4} />
+              <p className="mt-1 text-xs text-muted-foreground">{t("paperOcrPromptHint", lang)}</p>
+            </Field>
+
             <div className="sm:col-span-2">
               <TokenUsageWidget />
             </div>
