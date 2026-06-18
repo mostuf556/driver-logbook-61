@@ -15,6 +15,24 @@ export const DEFAULT_CSV_COLUMNS: CsvColumn[] = [
   { key: "guardName", header: "שם השומר", enabled: true },
 ];
 
+// Paper OCR import: column order = field meaning. Editable in Settings.
+// Order is: date, fullName, idOrPhone, carNumber, entryTime, exitTime,
+// approverName, company, guardName.
+export const DEFAULT_PAPER_OCR_COLUMNS: string[] = [
+  "תאריך",
+  "שם הנהג",
+  "תעודת זהות",
+  "מספר רכב",
+  "שעת כניסה",
+  "שעת יציאה",
+  "שם המאשר",
+  "חברה",
+  "שם השומר",
+];
+
+export const DEFAULT_PAPER_OCR_PROMPT =
+  "Extract every driver-log row from this image. Return STRICT JSON with shape {\"rows\":[[...]]} where each inner array's values map IN ORDER to the columns: {{COLUMNS}}. Dates as YYYY-MM-DD, times as HH:mm (24h). Use empty string for missing values. No prose, no markdown, no explanation.";
+
 export const DEFAULT_SETTINGS: AppSettings = {
   direction: "rtl",
   language: "he",
@@ -88,6 +106,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ocrAutoFillCarNumber: true,
   ocrRequireConfirmation: true,
   ocrMaxImageSizeMB: 5,
+
+  paperOcrColumns: DEFAULT_PAPER_OCR_COLUMNS,
+  paperPhoneSeparator: "-",
+  paperOcrPrompt: DEFAULT_PAPER_OCR_PROMPT,
 
   storageNamespace: "driver-report",
 
