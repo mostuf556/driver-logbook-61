@@ -38,8 +38,7 @@ test("all routes load without console or page errors", async ({ page }) => {
     if (!isIgnored(text)) failures.push(`[console] ${page.url()} :: ${text}`);
   });
   page.on("pageerror", (err) => {
-    if (!isIgnored(err.message))
-      failures.push(`[pageerror] ${page.url()} :: ${err.message}`);
+    if (!isIgnored(err.message)) failures.push(`[pageerror] ${page.url()} :: ${err.message}`);
   });
 
   for (const path of routes) {
@@ -53,7 +52,5 @@ test("all routes load without console or page errors", async ({ page }) => {
     expect(bodyText.length, `empty body on ${path}`).toBeGreaterThan(0);
   }
 
-  expect(failures, `runtime errors detected:\n${failures.join("\n")}`).toEqual(
-    [],
-  );
+  expect(failures, `runtime errors detected:\n${failures.join("\n")}`).toEqual([]);
 });

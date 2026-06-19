@@ -1,11 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type {
-  Reporter,
-  TestCase,
-  TestResult,
-  FullResult,
-} from "@playwright/test/reporter";
+import type { Reporter, TestCase, TestResult, FullResult } from "@playwright/test/reporter";
 
 type Entry = {
   title: string;

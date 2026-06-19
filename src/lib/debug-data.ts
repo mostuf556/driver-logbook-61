@@ -2,8 +2,33 @@ import { uid } from "./storage";
 import { nowHHMM, todayISO } from "./time";
 import type { AppSettings, Contact, DriverReport } from "./types";
 
-const FIRST = ["דוד", "משה", "יוסי", "אבי", "רון", "שלומי", "אמיר", "דני", "ניר", "אורי", "איתי", "תומר"];
-const LAST = ["כהן", "לוי", "מזרחי", "פרץ", "אזולאי", "ביטון", "דהן", "פנחס", "אוחיון", "חדד", "פרידמן"];
+const FIRST = [
+  "דוד",
+  "משה",
+  "יוסי",
+  "אבי",
+  "רון",
+  "שלומי",
+  "אמיר",
+  "דני",
+  "ניר",
+  "אורי",
+  "איתי",
+  "תומר",
+];
+const LAST = [
+  "כהן",
+  "לוי",
+  "מזרחי",
+  "פרץ",
+  "אזולאי",
+  "ביטון",
+  "דהן",
+  "פנחס",
+  "אוחיון",
+  "חדד",
+  "פרידמן",
+];
 const COMPANIES = ["דליפה בעמ", "אלקטרה", "שופרסל", "אמזון", "פרטי", "DHL"];
 const APPROVERS = ["מנהל שכבה", "אורי", "שירה", "דוד"];
 const GUARDS = ["שומר ראשי", "ערן", "מאיר", "יוני"];
@@ -29,7 +54,9 @@ function israeliId(): string {
 }
 function plate(): string {
   // 3-2-3 or 2-3-2 patterns
-  const a = digits(3), b = digits(2), c = digits(3);
+  const a = digits(3),
+    b = digits(2),
+    c = digits(3);
   return `${a}-${b}-${c}`;
 }
 function phone(): string {

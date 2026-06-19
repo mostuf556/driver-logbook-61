@@ -2,7 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Download, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { AppLayout } from "@/components/AppLayout";
 import { EntriesTable } from "@/components/EntriesTable";
 import { PaperOcrDialog } from "@/components/PaperOcrDialog";
@@ -10,12 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { t } from "@/lib/i18n";
 import type { DriverReport } from "@/lib/types";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAppData } from "@/hooks/use-app-data";
 import { exportAllReports, exportReportsForDate, importReportsCsv } from "@/lib/csv";
 import { nowHHMM, todayISO } from "@/lib/time";
@@ -54,14 +54,7 @@ function HomePage() {
     if (!q) return [] as typeof open;
     const normalizedQuery = normalizePlate(q);
     return open.filter((r) => {
-      const haystack = [
-        r.carNumber,
-        r.firstName,
-        r.lastName,
-        r.idNumber,
-        r.phone,
-        r.company,
-      ]
+      const haystack = [r.carNumber, r.firstName, r.lastName, r.idNumber, r.phone, r.company]
         .map(normalizePlate)
         .join(" ");
       return haystack.includes(normalizedQuery);
@@ -72,7 +65,11 @@ function HomePage() {
     updateReports(
       reports.map((r) =>
         r.id === id
-          ? { ...r, exitTime: nowHHMM(settings.roundTimesToMinutes), updatedAt: new Date().toISOString() }
+          ? {
+              ...r,
+              exitTime: nowHHMM(settings.roundTimesToMinutes),
+              updatedAt: new Date().toISOString(),
+            }
           : r,
       ),
     );
@@ -89,11 +86,15 @@ function HomePage() {
         return;
       }
       const existingKeys = new Set(reports.map((r) => `${r.date}|${r.carNumber}|${r.entryTime}`));
-      const newRecords = imported.filter((r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`));
+      const newRecords = imported.filter(
+        (r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`),
+      );
       const skipped = imported.length - newRecords.length;
       updateReports([...newRecords, ...reports]);
       if (skipped > 0) {
-        toast.success(`${newRecords.length} ${t("recordsImported", lang)} (${skipped} ${t("importDuplicatesSkipped", lang)})`);
+        toast.success(
+          `${newRecords.length} ${t("recordsImported", lang)} (${skipped} ${t("importDuplicatesSkipped", lang)})`,
+        );
       } else {
         toast.success(`${newRecords.length} ${t("recordsImported", lang)}`);
       }
@@ -108,7 +109,9 @@ function HomePage() {
       return;
     }
     const existingKeys = new Set(reports.map((r) => `${r.date}|${r.carNumber}|${r.entryTime}`));
-    const merged = newReports.filter((r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`));
+    const merged = newReports.filter(
+      (r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`),
+    );
     updateReports([...merged, ...reports]);
     toast.success(`${merged.length} ${t("importPaperSuccess", lang)}`);
   };
@@ -132,7 +135,8 @@ function HomePage() {
           <div>
             <h1 className="text-2xl font-bold">{t("pageHomeHeading", lang)}</h1>
             <p className="text-sm text-muted-foreground">
-              {open.length} {t("todayOpenCount", lang)} · {todayClosed.length} {t("todayClosedCount", lang)}
+              {open.length} {t("todayOpenCount", lang)} · {todayClosed.length}{" "}
+              {t("todayClosedCount", lang)}
             </p>
           </div>
           <TooltipProvider>
@@ -211,7 +215,9 @@ function HomePage() {
                       className="flex items-center justify-between rounded border bg-card p-3"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-lg" dir="ltr">{r.carNumber}</span>
+                        <span className="font-mono text-lg" dir="ltr">
+                          {r.carNumber}
+                        </span>
                         <span className="text-sm text-muted-foreground">
                           {fullName} · {t("entryTime", lang)} {r.entryTime}
                         </span>
@@ -230,7 +236,9 @@ function HomePage() {
             <AccordionTrigger>
               <div className="flex items-center justify-between gap-3">
                 <span className="text-lg font-semibold">{t("currentlyOnSite", lang)}</span>
-                <span className="text-sm text-muted-foreground">{open.length} {t("todayOpenCount", lang)}</span>
+                <span className="text-sm text-muted-foreground">
+                  {open.length} {t("todayOpenCount", lang)}
+                </span>
               </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -241,7 +249,9 @@ function HomePage() {
             <AccordionTrigger>
               <div className="flex items-center justify-between gap-3">
                 <span className="text-lg font-semibold">{t("todayClosed", lang)}</span>
-                <span className="text-sm text-muted-foreground">{todayClosed.length} {t("noRecords", lang)}</span>
+                <span className="text-sm text-muted-foreground">
+                  {todayClosed.length} {t("noRecords", lang)}
+                </span>
               </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -252,7 +262,9 @@ function HomePage() {
             <AccordionTrigger>
               <div className="flex items-center justify-between gap-3">
                 <span className="text-lg font-semibold">{t("history", lang)}</span>
-                <span className="text-sm text-muted-foreground">{history.length} {t("noRecords", lang)}</span>
+                <span className="text-sm text-muted-foreground">
+                  {history.length} {t("noRecords", lang)}
+                </span>
               </div>
             </AccordionTrigger>
             <AccordionContent>

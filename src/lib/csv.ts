@@ -12,8 +12,10 @@ export function parseCsvLine(line: string, delim: string): string[] {
     const ch = line[i];
     if (inQuotes) {
       if (ch === '"') {
-        if (line[i + 1] === '"') { cur += '"'; i++; }
-        else inQuotes = false;
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else inQuotes = false;
       } else {
         cur += ch;
       }
@@ -148,20 +150,45 @@ export function importReportsCsv(text: string): DriverReport[] {
 
   // Map header text → CsvColumnKey
   const HEADER_MAP: Record<string, CsvColumnKey> = {
-    "תאריך": "date", "date": "date",
-    "שם פרטי": "firstName", "firstname": "firstName", "first name": "firstName",
-    "שם משפחה": "lastName", "lastname": "lastName", "last name": "lastName",
-    "תעודת זהות": "idNumber", "idnumber": "idNumber", "id": "idNumber", "ת.ז.": "idNumber",
-    "טלפון": "phone", "phone": "phone",
-    "מספר רכב": "carNumber", "carnumber": "carNumber", "car number": "carNumber", "plate": "carNumber",
-    "שעת כניסה": "entryTime", "entrytime": "entryTime", "entry time": "entryTime", "כניסה": "entryTime",
-    "שעת יציאה": "exitTime", "exittime": "exitTime", "exit time": "exitTime", "יציאה": "exitTime",
-    "שם המאשר": "approverName", "approvername": "approverName", "approver": "approverName",
-    "חברה": "company", "company": "company",
-    "שם השומר": "guardName", "guardname": "guardName", "guard": "guardName",
+    תאריך: "date",
+    date: "date",
+    "שם פרטי": "firstName",
+    firstname: "firstName",
+    "first name": "firstName",
+    "שם משפחה": "lastName",
+    lastname: "lastName",
+    "last name": "lastName",
+    "תעודת זהות": "idNumber",
+    idnumber: "idNumber",
+    id: "idNumber",
+    "ת.ז.": "idNumber",
+    טלפון: "phone",
+    phone: "phone",
+    "מספר רכב": "carNumber",
+    carnumber: "carNumber",
+    "car number": "carNumber",
+    plate: "carNumber",
+    "שעת כניסה": "entryTime",
+    entrytime: "entryTime",
+    "entry time": "entryTime",
+    כניסה: "entryTime",
+    "שעת יציאה": "exitTime",
+    exittime: "exitTime",
+    "exit time": "exitTime",
+    יציאה: "exitTime",
+    "שם המאשר": "approverName",
+    approvername: "approverName",
+    approver: "approverName",
+    חברה: "company",
+    company: "company",
+    "שם השומר": "guardName",
+    guardname: "guardName",
+    guard: "guardName",
   };
 
-  const colMap: (CsvColumnKey | null)[] = headers.map((h) => HEADER_MAP[h.toLowerCase()] ?? HEADER_MAP[h] ?? null);
+  const colMap: (CsvColumnKey | null)[] = headers.map(
+    (h) => HEADER_MAP[h.toLowerCase()] ?? HEADER_MAP[h] ?? null,
+  );
 
   const records: DriverReport[] = [];
   for (let i = 1; i < lines.length; i++) {
@@ -194,9 +221,7 @@ export function importReportsCsv(text: string): DriverReport[] {
   return records;
 }
 
-export function exportContactsCsv(  contacts: Contact[],
-  s: AppSettings,
-) {
+export function exportContactsCsv(contacts: Contact[], s: AppSettings) {
   const delim = s.csvDelimiter;
   const includeBom = s.csvIncludeBom;
   const header = ["שם פרטי", "שם משפחה", "תעודת זהות", "טלפון", "חברה", "מספרי רכב"];

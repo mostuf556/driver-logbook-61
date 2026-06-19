@@ -24,9 +24,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     viewport: { width: 1280, height: 720 },
   },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-  ],
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {

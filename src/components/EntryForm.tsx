@@ -73,9 +73,7 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       return;
     }
     const next: DriverReport = { ...form, updatedAt: new Date().toISOString() };
-    const list = isEdit
-      ? reports.map((r) => (r.id === next.id ? next : r))
-      : [next, ...reports];
+    const list = isEdit ? reports.map((r) => (r.id === next.id ? next : r)) : [next, ...reports];
     updateReports(list);
     updateContacts(upsertContactFromReport(contacts, next, settings));
     toast.success(isEdit ? t("reportUpdated", lang) : t("reportSaved", lang));
@@ -86,7 +84,12 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
     <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2" dir="rtl">
       {debug && !isEdit && (
         <div className="sm:col-span-2">
-          <Button type="button" variant="outline" size="sm" onClick={() => setForm(randomReport(settings))}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setForm(randomReport(settings))}
+          >
             {t("demoData", lang)}
           </Button>
         </div>
@@ -155,7 +158,11 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       <div className="space-y-1.5">
         <Label>{t("carNumber", lang)}</Label>
         <div className="flex gap-2">
-          <Input value={form.carNumber} onChange={(e) => set("carNumber", e.target.value)} dir="ltr" />
+          <Input
+            value={form.carNumber}
+            onChange={(e) => set("carNumber", e.target.value)}
+            dir="ltr"
+          />
           <PlateOcrDialog
             settings={settings}
             onConfirm={(p) => set("carNumber", p)}
@@ -165,7 +172,11 @@ export function EntryForm({ existing }: { existing?: DriverReport }) {
       </div>
       <div className="space-y-1.5">
         <Label>{t("entryTime", lang)}</Label>
-        <Input type="time" value={form.entryTime} onChange={(e) => set("entryTime", e.target.value)} />
+        <Input
+          type="time"
+          value={form.entryTime}
+          onChange={(e) => set("entryTime", e.target.value)}
+        />
       </div>
       <div className="space-y-1.5">
         <Label>{t("exitTime", lang)}</Label>

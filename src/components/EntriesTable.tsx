@@ -46,7 +46,11 @@ export function EntriesTable({
   const onLeave = (r: DriverReport) => {
     const next = reports.map((x) =>
       x.id === r.id
-        ? { ...x, exitTime: nowHHMM(settings.roundTimesToMinutes), updatedAt: new Date().toISOString() }
+        ? {
+            ...x,
+            exitTime: nowHHMM(settings.roundTimesToMinutes),
+            updatedAt: new Date().toISOString(),
+          }
         : x,
     );
     updateReports(next);
@@ -61,7 +65,11 @@ export function EntriesTable({
   const hideExit = hideExitColumns ?? rows.every((r) => !r.exitTime);
 
   if (!rows.length) {
-    return <div className="rounded border border-dashed p-6 text-center text-sm text-muted-foreground">אין רשומות</div>;
+    return (
+      <div className="rounded border border-dashed p-6 text-center text-sm text-muted-foreground">
+        אין רשומות
+      </div>
+    );
   }
 
   return (
@@ -70,13 +78,27 @@ export function EntriesTable({
         <TableHeader>
           <TableRow>
             <TableHead className="whitespace-nowrap">{t("date", settings.language)}</TableHead>
-            <TableHead className="whitespace-nowrap">{t("driverName", settings.language)}</TableHead>
-            <TableHead className="hidden sm:table-cell whitespace-nowrap">{t("company", settings.language)}</TableHead>
+            <TableHead className="whitespace-nowrap">
+              {t("driverName", settings.language)}
+            </TableHead>
+            <TableHead className="hidden sm:table-cell whitespace-nowrap">
+              {t("company", settings.language)}
+            </TableHead>
             <TableHead className="whitespace-nowrap">{t("carNumber", settings.language)}</TableHead>
             <TableHead className="whitespace-nowrap">{t("entryTime", settings.language)}</TableHead>
-            {!hideExit && <TableHead className="whitespace-nowrap">{t("exitTime", settings.language)}</TableHead>}
-            {!hideExit && <TableHead className="whitespace-nowrap">{t("totalTime", settings.language)}</TableHead>}
-            <TableHead className="whitespace-nowrap text-end">{t("actions", settings.language)}</TableHead>
+            {!hideExit && (
+              <TableHead className="whitespace-nowrap">
+                {t("exitTime", settings.language)}
+              </TableHead>
+            )}
+            {!hideExit && (
+              <TableHead className="whitespace-nowrap">
+                {t("totalTime", settings.language)}
+              </TableHead>
+            )}
+            <TableHead className="whitespace-nowrap text-end">
+              {t("actions", settings.language)}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,26 +108,33 @@ export function EntriesTable({
             const fullName = [r.firstName, r.lastName].filter(Boolean).join(" ");
             return (
               <TableRow key={r.id} className={!r.exitTime ? "bg-accent/40" : ""}>
-                <TableCell className="whitespace-nowrap">{formatDate(r.date, settings.dateFormat)}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {formatDate(r.date, settings.dateFormat)}
+                </TableCell>
                 <TableCell className="font-medium whitespace-nowrap">
                   {fullName}
                   <div className="text-xs text-muted-foreground">{r.idNumber}</div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell whitespace-nowrap">{r.company}</TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap">
+                  {r.company}
+                </TableCell>
                 <TableCell className="font-mono whitespace-nowrap">{r.carNumber}</TableCell>
                 <TableCell className="whitespace-nowrap">{r.entryTime}</TableCell>
                 {!hideExit && (
                   <TableCell className="whitespace-nowrap">
-                    {r.exitTime ?? (
-                      settings.liveOnSiteBadge ? (
-                        <Badge variant="secondary">{t("insideWithTime", lang)} {formatTotal(live)}</Badge>
+                    {r.exitTime ??
+                      (settings.liveOnSiteBadge ? (
+                        <Badge variant="secondary">
+                          {t("insideWithTime", lang)} {formatTotal(live)}
+                        </Badge>
                       ) : (
                         <Badge variant="secondary">{t("inside", lang)}</Badge>
-                      )
-                    )}
+                      ))}
                   </TableCell>
                 )}
-                {!hideExit && <TableCell className="whitespace-nowrap">{formatTotal(total)}</TableCell>}
+                {!hideExit && (
+                  <TableCell className="whitespace-nowrap">{formatTotal(total)}</TableCell>
+                )}
                 <TableCell className="whitespace-nowrap">
                   <div className="flex justify-end gap-1">
                     {showLeave && !r.exitTime && (

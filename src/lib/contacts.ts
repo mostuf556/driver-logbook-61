@@ -42,7 +42,9 @@ export function upsertContactFromReport(
       const v = candidate[k];
       if (!v) return;
       if (k === "carNumbers") {
-        merged.carNumbers = Array.from(new Set([...(merged.carNumbers || []), ...candidate.carNumbers]));
+        merged.carNumbers = Array.from(
+          new Set([...(merged.carNumbers || []), ...candidate.carNumbers]),
+        );
         return;
       }
       (merged as unknown as Record<string, unknown>)[k] = v;
@@ -76,13 +78,26 @@ export function getSuggestions(
   // Map autocomplete field → contact key. Fields not in contacts return [].
   let sourceKey: keyof Contact;
   switch (field) {
-    case "firstName": sourceKey = "firstName"; break;
-    case "lastName": sourceKey = "lastName"; break;
-    case "idNumber": sourceKey = "idNumber"; break;
-    case "phone": sourceKey = "phone"; break;
-    case "company": sourceKey = "company"; break;
-    case "carNumber": sourceKey = "carNumbers"; break;
-    default: return [];
+    case "firstName":
+      sourceKey = "firstName";
+      break;
+    case "lastName":
+      sourceKey = "lastName";
+      break;
+    case "idNumber":
+      sourceKey = "idNumber";
+      break;
+    case "phone":
+      sourceKey = "phone";
+      break;
+    case "company":
+      sourceKey = "company";
+      break;
+    case "carNumber":
+      sourceKey = "carNumbers";
+      break;
+    default:
+      return [];
   }
 
   const q = s.caseSensitive ? query : query.toLowerCase();
@@ -96,7 +111,9 @@ export function getSuggestions(
     if (Array.isArray(rawValue)) {
       const values = rawValue.filter(Boolean) as string[];
       const normalized = values.map((v) => (s.caseSensitive ? v : v.toLowerCase()));
-      matched = normalized.some((val) => (s.matchMode === "prefix" ? val.startsWith(q) : val.includes(q)));
+      matched = normalized.some((val) =>
+        s.matchMode === "prefix" ? val.startsWith(q) : val.includes(q),
+      );
       dedupValue = values.join(",");
     } else {
       const val = rawValue as string;
@@ -107,7 +124,8 @@ export function getSuggestions(
     }
 
     if (!matched) continue;
-    const dedupKey = dedupValue + "|" + c.company + "|" + c.idNumber + "|" + c.firstName + c.lastName;
+    const dedupKey =
+      dedupValue + "|" + c.company + "|" + c.idNumber + "|" + c.firstName + c.lastName;
     if (seen.has(dedupKey)) continue;
     seen.add(dedupKey);
     out.push(c);

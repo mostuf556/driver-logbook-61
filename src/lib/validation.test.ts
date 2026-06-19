@@ -15,14 +15,25 @@ describe("validation helpers", () => {
   });
 
   it("validateIdNumber checks length and checksum", () => {
-    const s = { ...DEFAULT_SETTINGS, requireIdNumber: true, idNumberLength: 9, validateIsraeliId: true };
+    const s = {
+      ...DEFAULT_SETTINGS,
+      requireIdNumber: true,
+      idNumberLength: 9,
+      validateIsraeliId: true,
+    };
     expect(validateIdNumber("", s)).toMatch(/חובה/);
     expect(validateIdNumber("12345678a", s)).toMatch(/ספרות/);
     expect(validateIdNumber("123456780", s)).toMatch(/לא תקינה/);
   });
 
   it("validateCarNumber accepts and rejects based on length and regex", () => {
-    const s = { ...DEFAULT_SETTINGS, requireCarNumber: true, carNumberMinLength: 2, carNumberMaxLength: 10, carNumberAllowedChars: "^[A-Za-z0-9- ]+$" };
+    const s = {
+      ...DEFAULT_SETTINGS,
+      requireCarNumber: true,
+      carNumberMinLength: 2,
+      carNumberMaxLength: 10,
+      carNumberAllowedChars: "^[A-Za-z0-9- ]+$",
+    };
     expect(validateCarNumber("ABC-123", s)).toBeNull();
     expect(validateCarNumber("A", s)).toMatch(/קצר/);
     expect(validateCarNumber("THISISWAYTOOLONGPLATE", s)).toMatch(/ארוך/);

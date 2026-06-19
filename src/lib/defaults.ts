@@ -31,7 +31,7 @@ export const DEFAULT_PAPER_OCR_COLUMNS: string[] = [
 ];
 
 export const DEFAULT_PAPER_OCR_PROMPT =
-  "Extract every driver-log row from this image. Return STRICT JSON with shape {\"rows\":[[...]]} where each inner array's values map IN ORDER to the columns: {{COLUMNS}}. Dates as YYYY-MM-DD, times as HH:mm (24h). Use empty string for missing values. No prose, no markdown, no explanation.";
+  'Extract every driver-log row from this image. Return STRICT JSON with shape {"rows":[[...]]} where each inner array\'s values map IN ORDER to the columns: {{COLUMNS}}. Dates as YYYY-MM-DD, times as HH:mm (24h). Use empty string for missing values. No prose, no markdown, no explanation.';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   direction: "rtl",
@@ -103,7 +103,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   openRouterApiKeyTests: {},
   openRouterBaseUrl: "https://openrouter.ai/api/v1",
   openRouterModel: "google/gemini-2.5-flash",
-  ocrPrompt: "Extract only the license plate number from this image. Return only the plate digits/characters, no other text.",
+  ocrPrompt:
+    "Extract only the license plate number from this image. Return only the plate digits/characters, no other text.",
   ocrAutoFillCarNumber: true,
   ocrRequireConfirmation: true,
   ocrMaxImageSizeMB: 5,

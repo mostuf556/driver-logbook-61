@@ -21,12 +21,18 @@ const THEME_OPTIONS: { value: AppSettings["theme"]; label: string; icon: React.R
 
 function ThemeIcon({ theme }: { theme: AppSettings["theme"] }) {
   switch (theme) {
-    case "dark": return <Moon className="size-4" />;
-    case "blue": return <Waves className="size-4" />;
-    case "green": return <Leaf className="size-4" />;
-    case "warm": return <Flame className="size-4" />;
-    case "system": return <Monitor className="size-4" />;
-    default: return <Sun className="size-4" />;
+    case "dark":
+      return <Moon className="size-4" />;
+    case "blue":
+      return <Waves className="size-4" />;
+    case "green":
+      return <Leaf className="size-4" />;
+    case "warm":
+      return <Flame className="size-4" />;
+    case "system":
+      return <Monitor className="size-4" />;
+    default:
+      return <Sun className="size-4" />;
   }
 }
 

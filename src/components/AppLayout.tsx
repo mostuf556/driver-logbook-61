@@ -2,12 +2,7 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Bug, ExternalLink, Globe, KeyRound, Loader2, Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { useAppData } from "@/hooks/use-app-data";
@@ -87,7 +82,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-0.5 text-sm">
             {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to}>{item.label}</NavLink>
+              <NavLink key={item.to} to={item.to}>
+                {item.label}
+              </NavLink>
             ))}
 
             <TooltipProvider>
@@ -112,7 +109,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
               className="ms-1"
               onClick={() => {
                 const nextLanguage = settings.language === "he" ? "en" : "he";
-                updateSettings({ ...settings, language: nextLanguage, direction: nextLanguage === "en" ? "ltr" : "rtl" });
+                updateSettings({
+                  ...settings,
+                  language: nextLanguage,
+                  direction: nextLanguage === "en" ? "ltr" : "rtl",
+                });
               }}
             >
               <Globe />
@@ -122,7 +123,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
               size="icon"
               aria-label={t("reportBug", settings.language)}
               className="ms-1"
-              onClick={() => window.open("https://github.com/mostuf556/driver-logbook-61/issues", "_blank")}
+              onClick={() =>
+                window.open("https://github.com/mostuf556/driver-logbook-61/issues", "_blank")
+              }
             >
               <ExternalLink />
             </Button>
@@ -167,11 +170,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="md:hidden border-t bg-card/98 backdrop-blur-sm">
             <nav className="container mx-auto flex flex-col px-4 py-2 gap-0.5">
               {navItems.map((item) => (
-                <MobileNavLink
-                  key={item.to}
-                  to={item.to}
-                  onSelect={() => setMobileMenuOpen(false)}
-                >
+                <MobileNavLink key={item.to} to={item.to} onSelect={() => setMobileMenuOpen(false)}>
                   {item.label}
                 </MobileNavLink>
               ))}
@@ -179,7 +178,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
                 onClick={() => {
                   const nextLanguage = settings.language === "he" ? "en" : "he";
-                  updateSettings({ ...settings, language: nextLanguage, direction: nextLanguage === "en" ? "ltr" : "rtl" });
+                  updateSettings({
+                    ...settings,
+                    language: nextLanguage,
+                    direction: nextLanguage === "en" ? "ltr" : "rtl",
+                  });
                   setMobileMenuOpen(false);
                 }}
               >
@@ -199,7 +202,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               {(settings.showDebugToggle || debug) && (
                 <button
                   className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-start"
-                  onClick={() => { setDebugFlag(!debug); setMobileMenuOpen(false); }}
+                  onClick={() => {
+                    setDebugFlag(!debug);
+                    setMobileMenuOpen(false);
+                  }}
                 >
                   <Bug className="size-4" />
                   {debug ? t("debugOff", settings.language) : t("debug", settings.language)}

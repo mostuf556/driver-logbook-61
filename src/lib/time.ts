@@ -80,8 +80,5 @@ export function formatDate(iso: string, fmt: AppSettings["dateFormat"]): string 
 
 export function filenameDate(pattern: string, iso: string): string {
   const [y, m, d] = iso.split("-");
-  return pattern
-    .replace(/dd/g, d)
-    .replace(/mm/g, m)
-    .replace(/yyyy/g, y);
+  return pattern.replace(/dd/g, d).replace(/mm/g, m).replace(/yyyy/g, y);
 }

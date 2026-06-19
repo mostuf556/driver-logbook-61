@@ -28,7 +28,15 @@ import { randomContact } from "@/lib/debug-data";
 import { uid } from "@/lib/storage";
 import type { Contact } from "@/lib/types";
 
-const EMPTY: Contact = { id: "", firstName: "", lastName: "", idNumber: "", phone: "", company: "", carNumbers: [] };
+const EMPTY: Contact = {
+  id: "",
+  firstName: "",
+  lastName: "",
+  idNumber: "",
+  phone: "",
+  company: "",
+  carNumbers: [],
+};
 
 export function ContactsManager() {
   const { contacts, updateContacts, settings } = useAppData();
@@ -70,7 +78,8 @@ export function ContactsManager() {
     const header = lines[0];
     const delim = header.includes("\t") ? "\t" : header.includes(";") ? ";" : ",";
     const cols = parseCsvLine(header, delim).map((c) => c.trim());
-    const getIndex = (patterns: RegExp[]) => cols.findIndex((c) => patterns.some((re) => re.test(c)));
+    const getIndex = (patterns: RegExp[]) =>
+      cols.findIndex((c) => patterns.some((re) => re.test(c)));
     const fullNameIndex = getIndex([/שם הנהג|driverName/i]);
     const firstNameIndex = getIndex([/שם פרטי|firstname|first name/i]);
     const lastNameIndex = getIndex([/שם משפחה|lastname|last name/i]);
@@ -115,10 +124,19 @@ export function ContactsManager() {
 
       if (!firstName && !lastName && !idNumber) continue;
 
-      if (idNumber && existingByIdNumber.has(idNumber)) { skipped++; continue; }
-      if (phone && existingByPhone.has(phone)) { skipped++; continue; }
+      if (idNumber && existingByIdNumber.has(idNumber)) {
+        skipped++;
+        continue;
+      }
+      if (phone && existingByPhone.has(phone)) {
+        skipped++;
+        continue;
+      }
       const nameKey = `${firstName}|${lastName}|${company}`;
-      if (existingByName.has(nameKey)) { skipped++; continue; }
+      if (existingByName.has(nameKey)) {
+        skipped++;
+        continue;
+      }
 
       const newContact: Contact = {
         id: uid(),
@@ -136,7 +154,9 @@ export function ContactsManager() {
     }
     updateContacts([...added, ...contacts]);
     if (skipped > 0) {
-      toast.success(`${added.length} ${t("contactImportSuccess", lang)} (${skipped} ${t("contactImportSkipped", lang)})`);
+      toast.success(
+        `${added.length} ${t("contactImportSuccess", lang)} (${skipped} ${t("contactImportSkipped", lang)})`,
+      );
     } else {
       toast.success(`${added.length} ${t("contactImportSuccess", lang)}`);
     }
@@ -145,23 +165,56 @@ export function ContactsManager() {
   const filtered = contacts.filter((c) => {
     if (!filter) return true;
     const q = filter.toLowerCase();
-    return [c.firstName, c.lastName, c.idNumber, c.phone, c.company]
-      .some((v) => (v || "").toLowerCase().includes(q)) ||
-      c.carNumbers.some((n) => n.toLowerCase().includes(q));
+    return (
+      [c.firstName, c.lastName, c.idNumber, c.phone, c.company].some((v) =>
+        (v || "").toLowerCase().includes(q),
+      ) || c.carNumbers.some((n) => n.toLowerCase().includes(q))
+    );
   });
 
   return (
     <div className="space-y-6">
-      <form onSubmit={add} className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label={t("firstName", lang)} value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
-        <Field label={t("lastName", lang)} value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
-        <Field label={t("idNumber", lang)} value={form.idNumber} onChange={(v) => setForm({ ...form, idNumber: v })} />
-        <Field label={t("phone", lang)} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-        <Field label={t("company", lang)} value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
+      <form
+        onSubmit={add}
+        className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        <Field
+          label={t("firstName", lang)}
+          value={form.firstName}
+          onChange={(v) => setForm({ ...form, firstName: v })}
+        />
+        <Field
+          label={t("lastName", lang)}
+          value={form.lastName}
+          onChange={(v) => setForm({ ...form, lastName: v })}
+        />
+        <Field
+          label={t("idNumber", lang)}
+          value={form.idNumber}
+          onChange={(v) => setForm({ ...form, idNumber: v })}
+        />
+        <Field
+          label={t("phone", lang)}
+          value={form.phone}
+          onChange={(v) => setForm({ ...form, phone: v })}
+        />
+        <Field
+          label={t("company", lang)}
+          value={form.company}
+          onChange={(v) => setForm({ ...form, company: v })}
+        />
         <Field
           label={t("carNumber", lang)}
           value={form.carNumbers.join(", ")}
-          onChange={(v) => setForm({ ...form, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
+          onChange={(v) =>
+            setForm({
+              ...form,
+              carNumbers: v
+                .split(/[;,]+/)
+                .map((p) => p.trim())
+                .filter(Boolean),
+            })
+          }
           className="sm:col-span-2"
         />
         <div className="flex items-end gap-2">
@@ -179,7 +232,9 @@ export function ContactsManager() {
               {t("demoData", lang)}
             </Button>
           )}
-          <Button type="submit" className="w-full">{t("addContact", lang)}</Button>
+          <Button type="submit" className="w-full">
+            {t("addContact", lang)}
+          </Button>
         </div>
       </form>
 
@@ -217,7 +272,9 @@ export function ContactsManager() {
               <TableHead className="whitespace-nowrap">{t("lastName", lang)}</TableHead>
               <TableHead className="whitespace-nowrap">{t("idNumber", lang)}</TableHead>
               <TableHead className="whitespace-nowrap">{t("phone", lang)}</TableHead>
-              <TableHead className="hidden sm:table-cell whitespace-nowrap">{t("company", lang)}</TableHead>
+              <TableHead className="hidden sm:table-cell whitespace-nowrap">
+                {t("company", lang)}
+              </TableHead>
               <TableHead className="whitespace-nowrap">{t("carNumbers", lang)}</TableHead>
               <TableHead className="whitespace-nowrap text-end">{t("actions", lang)}</TableHead>
             </TableRow>
@@ -228,8 +285,12 @@ export function ContactsManager() {
                 <TableCell className="whitespace-nowrap">{c.firstName}</TableCell>
                 <TableCell className="whitespace-nowrap">{c.lastName}</TableCell>
                 <TableCell className="whitespace-nowrap font-mono">{c.idNumber}</TableCell>
-                <TableCell className="whitespace-nowrap font-mono" dir="ltr">{c.phone}</TableCell>
-                <TableCell className="hidden sm:table-cell whitespace-nowrap">{c.company}</TableCell>
+                <TableCell className="whitespace-nowrap font-mono" dir="ltr">
+                  {c.phone}
+                </TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap">
+                  {c.company}
+                </TableCell>
                 <TableCell className="whitespace-nowrap">{c.carNumbers.join("; ")}</TableCell>
                 <TableCell className="whitespace-nowrap text-end">
                   <div className="flex justify-end gap-1">
@@ -238,7 +299,9 @@ export function ContactsManager() {
                     </Button>
                     <ConfirmDialog
                       title={t("deleteContact", lang)}
-                      description={[c.firstName, c.lastName, c.idNumber].filter(Boolean).join(" · ")}
+                      description={[c.firstName, c.lastName, c.idNumber]
+                        .filter(Boolean)
+                        .join(" · ")}
                       onConfirm={() => remove(c.id)}
                       trigger={
                         <Button size="icon" variant="ghost">
@@ -268,21 +331,51 @@ export function ContactsManager() {
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={t("firstName", lang)} value={editing.firstName} onChange={(v) => setEditing({ ...editing, firstName: v })} />
-              <Field label={t("lastName", lang)} value={editing.lastName} onChange={(v) => setEditing({ ...editing, lastName: v })} />
-              <Field label={t("idNumber", lang)} value={editing.idNumber} onChange={(v) => setEditing({ ...editing, idNumber: v })} />
-              <Field label={t("phone", lang)} value={editing.phone} onChange={(v) => setEditing({ ...editing, phone: v })} />
-              <Field label={t("company", lang)} value={editing.company} onChange={(v) => setEditing({ ...editing, company: v })} />
+              <Field
+                label={t("firstName", lang)}
+                value={editing.firstName}
+                onChange={(v) => setEditing({ ...editing, firstName: v })}
+              />
+              <Field
+                label={t("lastName", lang)}
+                value={editing.lastName}
+                onChange={(v) => setEditing({ ...editing, lastName: v })}
+              />
+              <Field
+                label={t("idNumber", lang)}
+                value={editing.idNumber}
+                onChange={(v) => setEditing({ ...editing, idNumber: v })}
+              />
+              <Field
+                label={t("phone", lang)}
+                value={editing.phone}
+                onChange={(v) => setEditing({ ...editing, phone: v })}
+              />
+              <Field
+                label={t("company", lang)}
+                value={editing.company}
+                onChange={(v) => setEditing({ ...editing, company: v })}
+              />
               <Field
                 label={t("carNumber", lang)}
                 value={editing.carNumbers.join(", ")}
-                onChange={(v) => setEditing({ ...editing, carNumbers: v.split(/[;,]+/).map((p) => p.trim()).filter(Boolean) })}
+                onChange={(v) =>
+                  setEditing({
+                    ...editing,
+                    carNumbers: v
+                      .split(/[;,]+/)
+                      .map((p) => p.trim())
+                      .filter(Boolean),
+                  })
+                }
                 className="sm:col-span-2"
               />
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>{t("cancel", lang)}</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              {t("cancel", lang)}
+            </Button>
             <Button onClick={saveEdit}>{t("save", lang)}</Button>
           </DialogFooter>
         </DialogContent>

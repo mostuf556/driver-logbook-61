@@ -78,17 +78,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Driver Logbook is a web application for managing driver reports and vehicle entries." },
+      {
+        name: "description",
+        content:
+          "Driver Logbook is a web application for managing driver reports and vehicle entries.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Driver Logbook is a web application for managing driver reports and vehicle entries." },
+      {
+        property: "og:description",
+        content:
+          "Driver Logbook is a web application for managing driver reports and vehicle entries.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Driver Logbook is a web application for managing driver reports and vehicle entries." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp" },
+      {
+        name: "twitter:description",
+        content:
+          "Driver Logbook is a web application for managing driver reports and vehicle entries.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/2d0MtNEWKSYHmtar6Y2GMS5mioW2/social-images/social-1780991790249-car_license.webp",
+      },
     ],
     links: [
       {

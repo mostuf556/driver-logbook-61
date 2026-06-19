@@ -6,11 +6,11 @@ Build, test and lint
 
 - Install: npm install
 - Dev server: npm run dev
-- Build: npm run build  (development build: npm run build:dev)
+- Build: npm run build (development build: npm run build:dev)
 - Preview production build: npm run preview
-- Lint: npm run lint  (ESLint; to lint a single file use npx eslint <path>)
+- Lint: npm run lint (ESLint; to lint a single file use npx eslint <path>)
 - Format: npm run format (Prettier)
-- Tests: npm run test  (runs Vitest)
+- Tests: npm run test (runs Vitest)
   - Run a single test file: npm run test -- ./path/to/file.test.ts
   - Run tests by name: npm run test -- -t "test name"
 
@@ -22,7 +22,7 @@ CI
 High-level architecture
 
 - Framework: TanStack Start (file-based routing) + React + TypeScript + Vite
-- Routing: src/routes/ contains route files. __root.tsx is the app shell. Routes map filename → URL (see src/routes/README.md for conventions). routeTree.gen.ts is auto-generated — do not edit.
+- Routing: src/routes/ contains route files. \_\_root.tsx is the app shell. Routes map filename → URL (see src/routes/README.md for conventions). routeTree.gen.ts is auto-generated — do not edit.
 - UI: src/components/ and src/components/ui/ hold reusable UI primitives and dialogs.
 - State/data: client-only state persisted to localStorage; TanStack React Query used for data-fetch patterns where applicable.
 - Styling: TailwindCSS + utility components; direction is RTL where applicable.
@@ -30,7 +30,7 @@ High-level architecture
 
 Key conventions and repository-specific patterns
 
-- File-based routing specifics: dynamic segments use bare $ (e.g., users/$id.tsx); optional segments use the {-$name} syntax; splats are files named with $ (read via _splat param). Preserve __root.tsx and _layout.tsx semantics described in src/routes/README.md.
+- File-based routing specifics: dynamic segments use bare $ (e.g., users/$id.tsx); optional segments use the {-$name} syntax; splats are files named with $ (read via \_splat param). Preserve \_\_root.tsx and \_layout.tsx semantics described in src/routes/README.md.
 - Do NOT add Next.js/Remix-style folders like src/pages/ or app/layout.tsx — this repo follows TanStack Start conventions.
 - routeTree.gen.ts is generated — commit it only if generation step requires it, but avoid manual edits.
 - Tests: Vitest is configured; CI runs tests with V8 coverage provider. Local test runs should mirror CI flags when debugging coverage issues: npm run test -- --coverage --coverageProvider=v8

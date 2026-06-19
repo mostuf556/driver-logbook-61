@@ -31,8 +31,10 @@ describe("PaperOcr parsing", () => {
   });
 
   it("parseRecords parses tab-separated header+row with 11 columns", () => {
-    const header = "date\tentryTime\texitTime\tfirstName\tlastName\tidNumber\tphone\tcarNumber\tcompany\tapproverName\tguardName";
-    const row = "2024-01-02\t09:00\t10:00\tMaya\tLevi\t123456789\t0501234567\tABC123\tLogistics\tGadi\tNir";
+    const header =
+      "date\tentryTime\texitTime\tfirstName\tlastName\tidNumber\tphone\tcarNumber\tcompany\tapproverName\tguardName";
+    const row =
+      "2024-01-02\t09:00\t10:00\tMaya\tLevi\t123456789\t0501234567\tABC123\tLogistics\tGadi\tNir";
     const parsed = parseRecords(`${header}\n${row}`);
     expect(parsed).toHaveLength(1);
     expect(parsed[0].date).toBe("2024-01-02");

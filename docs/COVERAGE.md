@@ -47,12 +47,14 @@ This document maps implemented tasks (from `docs/DONE.md`) to automated test cov
 Summary: automated unit tests exist for autocomplete features. The remaining implemented items are either documentation/UI/or integration concerns and currently lack automated tests. I can add the missing tests; which do you want prioritized?
 
 Update (tests added):
+
 - Unit tests added for `PaperOcrDialog` parsing and normalization: `src/components/paperOcr.test.ts`.
 - Unit tests added for validation helpers: `src/lib/validation.test.ts`.
 - Unit tests added for contact upsert and fullname: `src/lib/contacts.test.ts` (extended).
 - Unit tests added for storage migration helpers: `src/lib/storage.test.ts`.
 
 Estimated coverage impact:
+
 - These new unit tests exercise parsing, normalization, and validation logic across multiple modules and should raise overall test coverage substantially. Based on typical LOC weighting, I estimate coverage will exceed 50% after running the suite.
 
 Note: I attempted to run the test suite in this environment to produce a verified coverage report, but the execution tool failed due to an environment filesystem provider error. To run the tests and obtain a coverage report locally or in CI, use:

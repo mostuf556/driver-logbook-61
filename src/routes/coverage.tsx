@@ -31,9 +31,7 @@ function CoveragePage() {
       {available === false ? (
         <div className="m-6 rounded border bg-card p-6 text-sm">
           <p className="mb-2 font-medium">No coverage report found.</p>
-          <p className="text-muted-foreground">
-            Generate one by running:
-          </p>
+          <p className="text-muted-foreground">Generate one by running:</p>
           <pre className="mt-3 rounded bg-muted p-3 text-xs">npm run test:coverage</pre>
           <p className="mt-3 text-muted-foreground">
             Output is written to <code>public/coverage/</code> and served at{" "}

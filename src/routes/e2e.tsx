@@ -46,8 +46,8 @@ function E2EPage() {
           <p className="text-muted-foreground">Generate them by running:</p>
           <pre className="mt-3 rounded bg-muted p-3 text-xs">npm run test:e2e</pre>
           <p className="mt-3 text-muted-foreground">
-            Output is written to <code>public/e2e-results/</code> and served
-            at <code>/e2e-results/</code>.
+            Output is written to <code>public/e2e-results/</code> and served at{" "}
+            <code>/e2e-results/</code>.
           </p>
         </div>
       ) : (
@@ -63,9 +63,7 @@ function E2EPage() {
                 <span
                   className={
                     "text-xs font-mono " +
-                    (t.status === "passed"
-                      ? "text-green-600"
-                      : "text-destructive")
+                    (t.status === "passed" ? "text-green-600" : "text-destructive")
                   }
                 >
                   {t.status} · {Math.round(t.durationMs)}ms

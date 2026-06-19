@@ -43,16 +43,26 @@ function LogsPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="text-2xl font-bold">{t("pageLogsHeading", lang)}</h1>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={refresh}>{t("refresh", lang)}</Button>
-            <Button variant="outline" onClick={copy} disabled={!logs.length}>{t("copyJson", lang)}</Button>
-            <Button variant="outline" onClick={download} disabled={!logs.length}>{t("download", lang)}</Button>
+            <Button variant="outline" onClick={refresh}>
+              {t("refresh", lang)}
+            </Button>
+            <Button variant="outline" onClick={copy} disabled={!logs.length}>
+              {t("copyJson", lang)}
+            </Button>
+            <Button variant="outline" onClick={download} disabled={!logs.length}>
+              {t("download", lang)}
+            </Button>
             <ConfirmDialog
               title={t("clearLogConfirm", lang)}
               onConfirm={() => {
                 clearErrorLog();
                 refresh();
               }}
-              trigger={<Button variant="destructive" disabled={!logs.length}>{t("clear", lang)}</Button>}
+              trigger={
+                <Button variant="destructive" disabled={!logs.length}>
+                  {t("clear", lang)}
+                </Button>
+              }
             />
           </div>
         </div>
@@ -71,10 +81,17 @@ function LogsPage() {
                   <span className="rounded bg-secondary px-2 py-0.5 text-xs">{l.source}</span>{" "}
                   <span className="font-medium">{l.message}</span>
                 </summary>
-                <pre className="mt-2 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground" dir="ltr">
-{l.stack || "(no stack)"}
+                <pre
+                  className="mt-2 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground"
+                  dir="ltr"
+                >
+                  {l.stack || "(no stack)"}
                 </pre>
-                {l.url && <p className="mt-1 text-xs text-muted-foreground" dir="ltr">{l.url}</p>}
+                {l.url && (
+                  <p className="mt-1 text-xs text-muted-foreground" dir="ltr">
+                    {l.url}
+                  </p>
+                )}
               </details>
             ))}
           </div>

@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { DEFAULT_SETTINGS } from "./defaults";
-import { loadSettings, saveSettings, splitName, migrateReport, migrateContact, uid } from "./storage";
+import {
+  loadSettings,
+  saveSettings,
+  splitName,
+  migrateReport,
+  migrateContact,
+  uid,
+} from "./storage";
 
 // Expose splitName, migrateReport, migrateContact by exporting them for tests.
 // We'll update storage.ts to export these helpers if not already exported.

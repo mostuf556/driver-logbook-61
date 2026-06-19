@@ -155,7 +155,7 @@ function parseRecordsFromJson(
     }
   }
   const rows: unknown[] = Array.isArray((data as { rows?: unknown }).rows)
-    ? ((data as { rows: unknown[] }).rows)
+    ? (data as { rows: unknown[] }).rows
     : Array.isArray(data)
       ? (data as unknown[])
       : [];
@@ -170,7 +170,8 @@ function parseRecordsFromJson(
       const obj = r as Record<string, unknown>;
       for (let i = 0; i < columns.length && i < PAPER_FIELD_ORDER.length; i++) {
         const v = obj[columns[i]] ?? obj[PAPER_FIELD_ORDER[i]];
-        if (v !== undefined) assignByField(row, PAPER_FIELD_ORDER[i], String(v ?? ""), phoneSeparator);
+        if (v !== undefined)
+          assignByField(row, PAPER_FIELD_ORDER[i], String(v ?? ""), phoneSeparator);
       }
     }
     result.push(row);
@@ -188,11 +189,15 @@ function parseRecords(text: string): DriverReport[] {
   if (!lines.length) return [];
 
   const header = lines[0].toLowerCase();
-  const hasHeader = /(date|entry|exit|first|last|id|plate|car)/.test(header) && lines[0].includes("\t");
+  const hasHeader =
+    /(date|entry|exit|first|last|id|plate|car)/.test(header) && lines[0].includes("\t");
   const dataLines = hasHeader ? lines.slice(1) : lines;
 
   return dataLines.map((line) => {
-    const values = line.split(/\t|,|;/).map(normalizeValue).filter(Boolean);
+    const values = line
+      .split(/\t|,|;/)
+      .map(normalizeValue)
+      .filter(Boolean);
     const row: DriverReport = emptyRow();
 
     if (values.length >= 11) {
@@ -245,11 +250,22 @@ export function PaperOcrDialog({
 
   const columns = settings.paperOcrColumns?.length
     ? settings.paperOcrColumns
-    : ["תאריך", "שם הנהג", "תעודת זהות", "מספר רכב", "שעת כניסה", "שעת יציאה", "שם המאשר", "חברה", "שם השומר"];
+    : [
+        "תאריך",
+        "שם הנהג",
+        "תעודת זהות",
+        "מספר רכב",
+        "שעת כניסה",
+        "שעת יציאה",
+        "שם המאשר",
+        "חברה",
+        "שם השומר",
+      ];
   const phoneSep = settings.paperPhoneSeparator || "-";
   const promptTemplate = settings.paperOcrPrompt || "";
-  const builtPrompt = (promptTemplate || "Extract rows as JSON {\"rows\":[[...]]} with columns: {{COLUMNS}}")
-    .replace("{{COLUMNS}}", columns.join(", "));
+  const builtPrompt = (
+    promptTemplate || 'Extract rows as JSON {"rows":[[...]]} with columns: {{COLUMNS}}'
+  ).replace("{{COLUMNS}}", columns.join(", "));
 
   const handleFile = async (file: File) => {
     setLoading(true);
@@ -274,7 +290,10 @@ export function PaperOcrDialog({
   const updateRow = (index: number, key: keyof DriverReport, value: string) => {
     setRows((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], [key]: key === "exitTime" ? (value || null) : value } as DriverReport;
+      next[index] = {
+        ...next[index],
+        [key]: key === "exitTime" ? value || null : value,
+      } as DriverReport;
       return next;
     });
   };
@@ -320,17 +339,25 @@ export function PaperOcrDialog({
                 {fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
               </Button>
             </div>
-            <DialogDescription>
-              {t("paperImportDialogDescription", lang)}
-            </DialogDescription>
+            <DialogDescription>{t("paperImportDialogDescription", lang)}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => cameraRef.current?.click()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => cameraRef.current?.click()}
+              >
                 <Camera className="size-4" /> {t("capture", lang)}
               </Button>
-              <Button type="button" variant="outline" className="flex-1" onClick={() => galleryRef.current?.click()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => galleryRef.current?.click()}
+              >
                 <ImagePlus className="size-4" /> {t("uploadImage", lang)}
               </Button>
             </div>
@@ -403,15 +430,49 @@ export function PaperOcrDialog({
                           placeholder={t("timeExample", lang)}
                         />
                       </div>
-                      <div className={`grid gap-2 ${fullscreen ? "sm:grid-cols-4" : "sm:grid-cols-2"} mt-3`}>
-                        <Input value={row.firstName} onChange={(e) => updateRow(index, "firstName", e.target.value)} placeholder={t("firstNamePlaceholder", lang)} />
-                        <Input value={row.lastName} onChange={(e) => updateRow(index, "lastName", e.target.value)} placeholder={t("lastNamePlaceholder", lang)} />
-                        <Input value={row.idNumber} onChange={(e) => updateRow(index, "idNumber", e.target.value)} placeholder={t("idNumberPlaceholder", lang)} />
-                        <Input value={row.phone} onChange={(e) => updateRow(index, "phone", e.target.value)} placeholder={t("phonePlaceholder", lang)} />
-                        <Input value={row.carNumber} onChange={(e) => updateRow(index, "carNumber", e.target.value)} placeholder={t("carNumberPlaceholder", lang)} />
-                        <Input value={row.company} onChange={(e) => updateRow(index, "company", e.target.value)} placeholder={t("companyPlaceholder", lang)} />
-                        <Input value={row.approverName} onChange={(e) => updateRow(index, "approverName", e.target.value)} placeholder={t("approverPlaceholder", lang)} />
-                        <Input value={row.guardName} onChange={(e) => updateRow(index, "guardName", e.target.value)} placeholder={t("guardPlaceholder", lang)} />
+                      <div
+                        className={`grid gap-2 ${fullscreen ? "sm:grid-cols-4" : "sm:grid-cols-2"} mt-3`}
+                      >
+                        <Input
+                          value={row.firstName}
+                          onChange={(e) => updateRow(index, "firstName", e.target.value)}
+                          placeholder={t("firstNamePlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.lastName}
+                          onChange={(e) => updateRow(index, "lastName", e.target.value)}
+                          placeholder={t("lastNamePlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.idNumber}
+                          onChange={(e) => updateRow(index, "idNumber", e.target.value)}
+                          placeholder={t("idNumberPlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.phone}
+                          onChange={(e) => updateRow(index, "phone", e.target.value)}
+                          placeholder={t("phonePlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.carNumber}
+                          onChange={(e) => updateRow(index, "carNumber", e.target.value)}
+                          placeholder={t("carNumberPlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.company}
+                          onChange={(e) => updateRow(index, "company", e.target.value)}
+                          placeholder={t("companyPlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.approverName}
+                          onChange={(e) => updateRow(index, "approverName", e.target.value)}
+                          placeholder={t("approverPlaceholder", lang)}
+                        />
+                        <Input
+                          value={row.guardName}
+                          onChange={(e) => updateRow(index, "guardName", e.target.value)}
+                          placeholder={t("guardPlaceholder", lang)}
+                        />
                       </div>
                     </div>
                   ))}

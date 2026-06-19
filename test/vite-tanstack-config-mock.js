@@ -3,5 +3,5 @@ export function defineConfig(config) {
   return {
     tanstackStart: config?.tanstackStart ?? {},
     vite: config?.vite ?? {},
-  }
+  };
 }

@@ -58,7 +58,7 @@ export function PlateOcrDialog({
   };
 
   const openDialog = () => {
-    if (!settings.openRouterApiKey && !(settings.openRouterApiKeys?.length)) {
+    if (!settings.openRouterApiKey && !settings.openRouterApiKeys?.length) {
       toast.error(t("keyMissing", lang), {
         action: onNavigateToSettings
           ? { label: t("openSettings", lang), onClick: onNavigateToSettings }
@@ -107,9 +107,7 @@ export function PlateOcrDialog({
       <DialogContent dir="rtl">
         <DialogHeader>
           <DialogTitle>{t("ocrDialogTitle", lang)}</DialogTitle>
-          <DialogDescription>
-            {t("ocrDialogDescription", lang)}
-          </DialogDescription>
+          <DialogDescription>{t("ocrDialogDescription", lang)}</DialogDescription>
         </DialogHeader>
 
         {/* Hidden file inputs */}
