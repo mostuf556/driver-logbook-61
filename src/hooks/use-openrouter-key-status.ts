@@ -12,7 +12,8 @@ export function useOpenRouterKeyStatus(settings: AppSettings): KeyStatus {
     ...(settings.openRouterApiKeys ?? []).filter(Boolean),
     settings.openRouterApiKey,
   ].filter(Boolean);
-  const fingerprint = keys.join("|") + "::" + settings.openRouterBaseUrl;
+  const lastTested = Object.values(settings.openRouterApiKeyTests ?? {}).join("|");
+  const fingerprint = `${keys.join("|")}::${settings.openRouterBaseUrl}::${settings.openRouterModel}::${lastTested}`;
 
   useEffect(() => {
     if (!keys.length) {

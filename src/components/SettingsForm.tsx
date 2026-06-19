@@ -78,9 +78,15 @@ export function SettingsForm() {
         .filter(([, value]) => typeof value === "string"),
     );
 
-    set("openRouterApiKeyTests", nextTests);
-    set("openRouterApiKeys", cleaned);
-    set("openRouterApiKey", "");
+    const nextSettings = {
+      ...s,
+      openRouterApiKeyTests: nextTests,
+      openRouterApiKeys: cleaned,
+      openRouterApiKey: "",
+    };
+
+    setS(nextSettings);
+    updateSettings(nextSettings);
   };
 
   const setOpenRouterKey = (index: number, value: string) => {
@@ -120,22 +126,25 @@ export function SettingsForm() {
 
     setKeyCheckingIndex(index);
     setKeyStatus(null);
+    const now = new Date().toISOString();
+    const nextSettings = {
+      ...s,
+      openRouterApiKeyTests: {
+        ...(s.openRouterApiKeyTests ?? {}),
+        [apiKey]: now,
+      },
+    };
+
     try {
       const url = `${s.openRouterBaseUrl.replace(/\/+$/, "")}`;
       await validateOpenRouterApiKey(url, apiKey, s.openRouterModel);
-      const now = new Date().toISOString();
-      set("openRouterApiKeyTests", {
-        ...(s.openRouterApiKeyTests ?? {}),
-        [apiKey]: now,
-      });
+      setS(nextSettings);
+      updateSettings(nextSettings);
       toast.success(t("keyStatusAvailable", lang));
     } catch (error) {
       const message = error instanceof Error ? error.message : t("keyCheckError", lang);
-      const now = new Date().toISOString();
-      set("openRouterApiKeyTests", {
-        ...(s.openRouterApiKeyTests ?? {}),
-        [apiKey]: now,
-      });
+      setS(nextSettings);
+      updateSettings(nextSettings);
       toast.error(message);
     } finally {
       setKeyCheckingIndex(null);
@@ -244,7 +253,8 @@ export function SettingsForm() {
     setKeyStatus(null);
     try {
       await checkOpenRouterKeyAvailability(s);
-      updateSettings(s);
+      const nextSettings = { ...s };
+      updateSettings(nextSettings);
       setKeyStatus(t("keyStatusAvailable", s.language));
       toast.success(t("keyStatusAvailable", s.language));
     } catch (error) {
@@ -296,8 +306,10 @@ export function SettingsForm() {
                 value={s.language}
                 onValueChange={(v) => {
                   const language = v as AppSettings["language"];
-                  set("language", language);
-                  set("direction", language === "en" ? "ltr" : "rtl");
+                  const direction = language === "en" ? "ltr" : "rtl";
+                  const nextSettings = { ...s, language, direction };
+                  setS(nextSettings);
+                  updateSettings(nextSettings);
                 }}
               >
                 <SelectTrigger>
