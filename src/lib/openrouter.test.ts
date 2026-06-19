@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkOpenRouterKeyAvailability } from "./openrouter";
 import { clearErrorLog, loadErrorLog } from "./error-log";
+import type { AppSettings } from "./types";
 
 describe("OpenRouter key validation", () => {
   beforeEach(() => {
@@ -17,23 +18,24 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: [],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as any),
+      } as AppSettings),
     ).rejects.toThrow("No OpenRouter API key configured");
   });
 
   it("validates a single valid key and logs the result", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => ({
+    const fetchStub = vi.fn(async () => ({
       ok: true,
       status: 200,
-      text: async () => "",
-    })) as any);
+      json: async () => ({ choices: [{ message: { content: "ok" } }] }),
+    }));
+    vi.stubGlobal("fetch", fetchStub as unknown as typeof fetch);
 
     await expect(
       checkOpenRouterKeyAvailability({
         openRouterApiKeys: ["valid-key-1"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as any),
+      } as AppSettings),
     ).resolves.toBe(true);
 
     const logs = loadErrorLog();
@@ -41,6 +43,23 @@ describe("OpenRouter key validation", () => {
     expect(logs[0].source).toBe("openrouter.key-check");
     expect(logs[0].message).toContain("succeeded");
     expect(logs[0].message).toContain("1/1");
+  });
+
+  it("rejects a response that returns an OpenRouter error payload even with 200 status", async () => {
+    const fetchStub = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ error: { message: "Invalid API key" } }),
+    }));
+    vi.stubGlobal("fetch", fetchStub as unknown as typeof fetch);
+
+    await expect(
+      checkOpenRouterKeyAvailability({
+        openRouterApiKeys: ["bad-key"],
+        openRouterApiKey: "",
+        openRouterBaseUrl: "https://openrouter.ai/api/v1",
+      } as AppSettings),
+    ).rejects.toThrow("OpenRouter key validation failed for 1 key(s)");
   });
 
   it("allows one valid key among multiple keys and records key validation details", async () => {
@@ -51,23 +70,25 @@ describe("OpenRouter key validation", () => {
           ok: false,
           status: 401,
           text: async () => "Unauthorized",
+          json: async () => ({ error: { message: "Unauthorized" } }),
         };
       }
       return {
         ok: true,
         status: 200,
+        json: async () => ({ choices: [{ message: { content: "ok" } }] }),
         text: async () => "",
       };
     });
 
-    vi.stubGlobal("fetch", fetchStub as any);
+    vi.stubGlobal("fetch", fetchStub as unknown as typeof fetch);
 
     await expect(
       checkOpenRouterKeyAvailability({
         openRouterApiKeys: ["bad-key", "valid-key-2"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as any),
+      } as AppSettings),
     ).resolves.toBe(true);
 
     const logs = loadErrorLog();
@@ -80,18 +101,19 @@ describe("OpenRouter key validation", () => {
   });
 
   it("fails when all configured keys are invalid and logs the failure", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => ({
+    const fetchStub = vi.fn(async () => ({
       ok: false,
       status: 401,
       text: async () => "Unauthorized",
-    })) as any);
+    }));
+    vi.stubGlobal("fetch", fetchStub as unknown as typeof fetch);
 
     await expect(
       checkOpenRouterKeyAvailability({
         openRouterApiKeys: ["bad-key-1", "bad-key-2"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as any),
+      } as AppSettings),
     ).rejects.toThrow("OpenRouter key validation failed for 2 key(s)");
 
     const logs = loadErrorLog();

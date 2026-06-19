@@ -64,6 +64,7 @@ const translations: Record<Language, Record<string, string>> = {
     keyStatusUnavailable: "המפתח לא זמין",
     keyCheckError: "שגיאה בבדיקת המפתח",
     openRouterKeyRequired: "יש להזין לפחות מפתח OpenRouter",
+    noOpenRouterKeysConfigured: "אין מפתחות OpenRouter מוגדרים",
     resetSettingsSuccess: "ההגדרות האופסו בהצלחה",
     keyMissing: "אין מפתח OpenRouter בהגדרות",
     openSettings: "פתח הגדרות",

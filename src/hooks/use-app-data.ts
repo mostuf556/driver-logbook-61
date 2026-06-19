@@ -47,14 +47,17 @@ export function useAppData() {
 
   const updateSettings = useCallback((s: AppSettings) => {
     saveSettings(s);
+    setSettings(s);
     notify();
   }, []);
   const updateReports = useCallback((r: DriverReport[]) => {
     saveReports(r);
+    setReports(r);
     notify();
   }, []);
   const updateContacts = useCallback((c: Contact[]) => {
     saveContacts(c);
+    setContacts(c);
     notify();
   }, []);
 

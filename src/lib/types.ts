@@ -128,6 +128,7 @@ export interface AppSettings {
   // OpenRouter
   openRouterApiKey: string;
   openRouterApiKeys: string[];
+  openRouterApiKeyTests: Record<string, string>;
   openRouterBaseUrl: string;
   openRouterModel: string;
   ocrPrompt: string;
