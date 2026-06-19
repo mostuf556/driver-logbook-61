@@ -38,6 +38,18 @@ export function logError(source: string, err: unknown, url?: string) {
   save([entry, ...loadErrorLog()]);
 }
 
+export function logEvent(source: string, message: string, url?: string) {
+  if (typeof window === "undefined") return;
+  const entry: LoggedError = {
+    id: Math.random().toString(36).slice(2),
+    at: new Date().toISOString(),
+    source,
+    message,
+    url: url || window.location.href,
+  };
+  save([entry, ...loadErrorLog()]);
+}
+
 export function clearErrorLog() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(KEY);
