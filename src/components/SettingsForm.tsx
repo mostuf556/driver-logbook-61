@@ -180,35 +180,6 @@ export function SettingsForm() {
     setS(settings);
   }, [settings]);
 
-  useEffect(() => {
-    if (
-      s.openRouterApiKey === settings.openRouterApiKey &&
-      JSON.stringify(s.openRouterApiKeys) === JSON.stringify(settings.openRouterApiKeys) &&
-      JSON.stringify(s.openRouterApiKeyTests) === JSON.stringify(settings.openRouterApiKeyTests) &&
-      s.openRouterBaseUrl === settings.openRouterBaseUrl &&
-      s.openRouterModel === settings.openRouterModel
-    ) {
-      return;
-    }
-
-    updateSettings({
-      ...settings,
-      openRouterApiKey: s.openRouterApiKey,
-      openRouterApiKeys: s.openRouterApiKeys,
-      openRouterApiKeyTests: s.openRouterApiKeyTests,
-      openRouterBaseUrl: s.openRouterBaseUrl,
-      openRouterModel: s.openRouterModel,
-    });
-  }, [
-    settings,
-    s.openRouterApiKey,
-    s.openRouterApiKeys,
-    s.openRouterApiKeyTests,
-    s.openRouterBaseUrl,
-    s.openRouterModel,
-    updateSettings,
-  ]);
-
   const set = <K extends keyof AppSettings>(k: K, v: AppSettings[K]) =>
     setS((prev) => ({ ...prev, [k]: v }));
 
