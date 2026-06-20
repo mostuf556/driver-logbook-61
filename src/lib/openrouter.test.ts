@@ -18,7 +18,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: [],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).rejects.toThrow("No OpenRouter API key configured");
   });
 

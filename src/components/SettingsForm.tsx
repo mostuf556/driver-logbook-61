@@ -277,7 +277,7 @@ export function SettingsForm() {
                 value={s.language}
                 onValueChange={(v) => {
                   const language = v as AppSettings["language"];
-                  const direction = language === "en" ? "ltr" : "rtl";
+                  const direction: AppSettings["direction"] = language === "en" ? "ltr" : "rtl";
                   const nextSettings = { ...s, language, direction };
                   setS(nextSettings);
                   updateSettings(nextSettings);
