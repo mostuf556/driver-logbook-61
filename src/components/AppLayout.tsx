@@ -11,28 +11,34 @@ import { useOpenRouterKeyStatus } from "@/hooks/use-openrouter-key-status";
 import { useTheme } from "@/hooks/use-theme";
 import { installErrorListeners } from "@/lib/error-log";
 import { t } from "@/lib/i18n";
-import type { KeyStatus } from "@/hooks/use-openrouter-key-status";
+import type { KeyStatusInfo } from "@/hooks/use-openrouter-key-status";
 
-function KeyStatusIcon({ status }: { status: KeyStatus }) {
-  if (status === "checking") {
+function KeyStatusIcon({ info }: { info: KeyStatusInfo }) {
+  if (info.status === "checking") {
     return <Loader2 className="size-4 animate-spin text-muted-foreground" />;
   }
+  // Green only when more than one key is valid; otherwise red.
   const color =
-    status === "valid"
+    info.validCount > 1
       ? "text-green-600 dark:text-green-400"
-      : status === "invalid"
-        ? "text-red-600 dark:text-red-400"
-        : status === "missing"
-          ? "text-amber-600 dark:text-amber-400"
-          : "text-muted-foreground";
+      : "text-red-600 dark:text-red-400";
   return <KeyRound className={`size-4 ${color}`} />;
+}
+
+function keyStatusTooltip(info: KeyStatusInfo, language: "he" | "en"): string {
+  if (info.status === "checking") return t("keyStatus_checking", language);
+  if (info.totalCount === 0) return t("keyStatus_missing", language);
+  const template = t("keyStatusCount", language);
+  return template
+    .replace("{valid}", String(info.validCount))
+    .replace("{total}", String(info.totalCount));
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { settings, updateSettings } = useAppData();
   useTheme(settings.theme);
   const debug = useDebugMode();
-  const keyStatus = useOpenRouterKeyStatus(settings);
+  const keyInfo = useOpenRouterKeyStatus(settings);
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navItems = [
@@ -92,13 +98,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <TooltipTrigger asChild>
                   <Link
                     to="/settings"
-                    aria-label={t(`keyStatus_${keyStatus}`, settings.language)}
+                    aria-label={keyStatusTooltip(keyInfo, settings.language)}
                     className="ms-1 inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent/60"
                   >
-                    <KeyStatusIcon status={keyStatus} />
+                    <KeyStatusIcon info={keyInfo} />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent>{t(`keyStatus_${keyStatus}`, settings.language)}</TooltipContent>
+                <TooltipContent>{keyStatusTooltip(keyInfo, settings.language)}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
@@ -148,10 +154,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="flex md:hidden items-center gap-1">
             <Link
               to="/settings"
-              aria-label={t(`keyStatus_${keyStatus}`, settings.language)}
+              aria-label={keyStatusTooltip(keyInfo, settings.language)}
               className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent/60"
             >
-              <KeyStatusIcon status={keyStatus} />
+              <KeyStatusIcon info={keyInfo} />
             </Link>
             <ThemeSwitcher />
             <Button

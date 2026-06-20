@@ -166,6 +166,7 @@ const translations: Record<Language, Record<string, string>> = {
     keyStatus_valid: "מפתח OpenRouter תקין",
     keyStatus_invalid: "מפתח OpenRouter לא תקין",
     keyStatus_missing: "לא הוגדר מפתח OpenRouter",
+    keyStatusCount: "{valid}/{total} מפתחות OpenRouter תקפים",
     paperOcrColumns: "עמודות לייבוא ממסמך",
     paperOcrColumnsHint: "סדר העמודות = משמעות השדה. עמודה 3 (ת.ז.) מתפצלת לטלפון/ת.ז. לפי הסימן.",
     paperPhoneSeparator: "סימן זיהוי טלפון בעמודת ת.ז.",
@@ -337,6 +338,7 @@ const translations: Record<Language, Record<string, string>> = {
     keyStatus_valid: "OpenRouter key is valid",
     keyStatus_invalid: "OpenRouter key is invalid",
     keyStatus_missing: "No OpenRouter key configured",
+    keyStatusCount: "{valid}/{total} OpenRouter keys valid",
     paperOcrColumns: "Paper import columns",
     paperOcrColumnsHint:
       "Column order = field meaning. Column 3 (ID) is split into ID / phone via the separator.",

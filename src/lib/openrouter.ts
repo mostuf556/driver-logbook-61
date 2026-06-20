@@ -218,6 +218,24 @@ export async function checkOpenRouterKeyAvailability(s: AppSettings): Promise<bo
   return true;
 }
 
+/**
+ * Validates each configured OpenRouter key in parallel and returns counts.
+ * Never throws — failures are simply not counted as valid.
+ */
+export async function countValidOpenRouterKeys(
+  s: AppSettings,
+): Promise<{ valid: number; total: number }> {
+  const keys = allApiKeys(s);
+  if (!keys.length) return { valid: 0, total: 0 };
+  const results = await Promise.allSettled(
+    keys.map((apiKey) =>
+      validateOpenRouterApiKey(s.openRouterBaseUrl, apiKey, s.openRouterModel),
+    ),
+  );
+  const valid = results.filter((r) => r.status === "fulfilled").length;
+  return { valid, total: keys.length };
+}
+
 export async function fileToDownscaledDataUrl(file: File, maxMB: number): Promise<string> {
   const limit = maxMB * 1024 * 1024;
   const readAsDataUrl = (blob: Blob) =>

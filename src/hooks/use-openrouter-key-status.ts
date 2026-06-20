@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
-import { checkOpenRouterKeyAvailability } from "@/lib/openrouter";
+import { countValidOpenRouterKeys } from "@/lib/openrouter";
 import type { AppSettings } from "@/lib/types";
 
 export type KeyStatus = "unknown" | "checking" | "valid" | "invalid" | "missing";
 
-/** Validates OpenRouter key(s) when settings change. Result is cached per key. */
-export function useOpenRouterKeyStatus(settings: AppSettings): KeyStatus {
-  const [status, setStatus] = useState<KeyStatus>("unknown");
+export interface KeyStatusInfo {
+  status: KeyStatus;
+  validCount: number;
+  totalCount: number;
+}
+
+/** Validates OpenRouter key(s) when settings change. Returns per-key counts. */
+export function useOpenRouterKeyStatus(settings: AppSettings): KeyStatusInfo {
+  const [info, setInfo] = useState<KeyStatusInfo>({
+    status: "unknown",
+    validCount: 0,
+    totalCount: 0,
+  });
 
   const keys = [
     ...(settings.openRouterApiKeys ?? []).filter(Boolean),
@@ -17,17 +27,23 @@ export function useOpenRouterKeyStatus(settings: AppSettings): KeyStatus {
 
   useEffect(() => {
     if (!keys.length) {
-      setStatus("missing");
+      setInfo({ status: "missing", validCount: 0, totalCount: 0 });
       return;
     }
     let cancelled = false;
-    setStatus("checking");
-    checkOpenRouterKeyAvailability(settings)
-      .then(() => {
-        if (!cancelled) setStatus("valid");
+    setInfo((prev) => ({ ...prev, status: "checking", totalCount: keys.length }));
+    countValidOpenRouterKeys(settings)
+      .then(({ valid, total }) => {
+        if (cancelled) return;
+        setInfo({
+          status: valid > 0 ? "valid" : "invalid",
+          validCount: valid,
+          totalCount: total,
+        });
       })
       .catch(() => {
-        if (!cancelled) setStatus("invalid");
+        if (!cancelled)
+          setInfo({ status: "invalid", validCount: 0, totalCount: keys.length });
       });
     return () => {
       cancelled = true;
@@ -35,5 +51,5 @@ export function useOpenRouterKeyStatus(settings: AppSettings): KeyStatus {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fingerprint]);
 
-  return status;
+  return info;
 }
