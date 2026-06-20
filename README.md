@@ -16,3 +16,10 @@ npm run dev
 ```
 
 Bugs, feature requests, and issues: https://github.com/mostuf556/driver-logbook-61/issues
+--------------------------
+
+
+TODOS:
+1. fix openrouter key validation. use https://github.com/mostuf2556/sign-fill-mobile/blob/main/src/lib/openrouter.ts#L36
+2. tell it to e2e to demonstrare how to use it and add it to the README.md
+3. base on 2 -> make the app better ! / make the demonstration understandable
