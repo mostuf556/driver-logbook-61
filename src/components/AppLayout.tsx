@@ -19,7 +19,7 @@ function KeyStatusIcon({ info }: { info: KeyStatusInfo }) {
   }
   // Green only when more than one key is valid; otherwise red.
   const color =
-    info.validCount > 1
+    info.validCount > 0
       ? "text-green-600 dark:text-green-400"
       : "text-red-600 dark:text-red-400";
   return <KeyRound className={`size-4 ${color}`} />;
