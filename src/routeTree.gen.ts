@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LogsRouteImport } from './routes/logs'
+import { Route as ImportPaperRouteImport } from './routes/import-paper'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as E2eRouteImport } from './routes/e2e'
 import { Route as CoverageRouteImport } from './routes/coverage'
@@ -27,6 +28,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const LogsRoute = LogsRouteImport.update({
   id: '/logs',
   path: '/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportPaperRoute = ImportPaperRouteImport.update({
+  id: '/import-paper',
+  path: '/import-paper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
+  '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
+  '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
   '/home': typeof HomeRoute
+  '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/coverage'
     | '/e2e'
     | '/home'
+    | '/import-paper'
     | '/logs'
     | '/settings'
     | '/entries/$id'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/coverage'
     | '/e2e'
     | '/home'
+    | '/import-paper'
     | '/logs'
     | '/settings'
     | '/entries/$id'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/coverage'
     | '/e2e'
     | '/home'
+    | '/import-paper'
     | '/logs'
     | '/settings'
     | '/entries/$id'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   CoverageRoute: typeof CoverageRoute
   E2eRoute: typeof E2eRoute
   HomeRoute: typeof HomeRoute
+  ImportPaperRoute: typeof ImportPaperRoute
   LogsRoute: typeof LogsRoute
   SettingsRoute: typeof SettingsRoute
   EntriesIdRoute: typeof EntriesIdRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/logs'
       fullPath: '/logs'
       preLoaderRoute: typeof LogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import-paper': {
+      id: '/import-paper'
+      path: '/import-paper'
+      fullPath: '/import-paper'
+      preLoaderRoute: typeof ImportPaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoverageRoute: CoverageRoute,
   E2eRoute: E2eRoute,
   HomeRoute: HomeRoute,
+  ImportPaperRoute: ImportPaperRoute,
   LogsRoute: LogsRoute,
   SettingsRoute: SettingsRoute,
   EntriesIdRoute: EntriesIdRoute,
@@ -229,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

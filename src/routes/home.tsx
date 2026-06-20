@@ -10,11 +10,9 @@ import {
 } from "@/components/ui/accordion";
 import { AppLayout } from "@/components/AppLayout";
 import { EntriesTable } from "@/components/EntriesTable";
-import { PaperOcrDialog } from "@/components/PaperOcrDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { t } from "@/lib/i18n";
-import type { DriverReport } from "@/lib/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAppData } from "@/hooks/use-app-data";
 import { exportAllReports, exportReportsForDate, importReportsCsv } from "@/lib/csv";
@@ -103,19 +101,6 @@ function HomePage() {
     }
   };
 
-  const mergePaperReports = (newReports: DriverReport[]) => {
-    if (newReports.length === 0) {
-      toast.error(t("importPaperNoRecords", lang));
-      return;
-    }
-    const existingKeys = new Set(reports.map((r) => `${r.date}|${r.carNumber}|${r.entryTime}`));
-    const merged = newReports.filter(
-      (r) => !existingKeys.has(`${r.date}|${r.carNumber}|${r.entryTime}`),
-    );
-    updateReports([...merged, ...reports]);
-    toast.success(`${merged.length} ${t("importPaperSuccess", lang)}`);
-  };
-
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -185,7 +170,9 @@ function HomePage() {
               >
                 {t("exportAll", lang)}
               </Button>
-              <PaperOcrDialog settings={settings} onMerge={mergePaperReports} />
+              <Button asChild variant="outline">
+                <Link to="/import-paper">{t("importPaper", lang)}</Link>
+              </Button>
               <Button asChild>
                 <Link to="/entries/new">{t("addNewEntry", lang)}</Link>
               </Button>

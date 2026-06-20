@@ -18,7 +18,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: [],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).rejects.toThrow("No OpenRouter API key configured");
   });
 
@@ -35,7 +35,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: ["valid-key-1"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).resolves.toBe(true);
 
     const logs = loadErrorLog();
@@ -58,7 +58,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: ["bad-key"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).rejects.toThrow("OpenRouter key validation failed for 1 key(s)");
   });
 
@@ -88,7 +88,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: ["bad-key", "valid-key-2"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).resolves.toBe(true);
 
     const logs = loadErrorLog();
@@ -113,7 +113,7 @@ describe("OpenRouter key validation", () => {
         openRouterApiKeys: ["bad-key-1", "bad-key-2"],
         openRouterApiKey: "",
         openRouterBaseUrl: "https://openrouter.ai/api/v1",
-      } as AppSettings),
+      } as unknown as AppSettings),
     ).rejects.toThrow("OpenRouter key validation failed for 2 key(s)");
 
     const logs = loadErrorLog();
