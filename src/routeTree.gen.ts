@@ -10,19 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as ImportPaperRouteImport } from './routes/import-paper'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as GuestRouteImport } from './routes/guest'
 import { Route as E2eRouteImport } from './routes/e2e'
 import { Route as CoverageRouteImport } from './routes/coverage'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuestThanksRouteImport } from './routes/guest.thanks'
 import { Route as EntriesNewRouteImport } from './routes/entries.new'
 import { Route as EntriesIdRouteImport } from './routes/entries.$id'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogsRoute = LogsRouteImport.update({
@@ -38,6 +46,11 @@ const ImportPaperRoute = ImportPaperRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuestRoute = GuestRouteImport.update({
+  id: '/guest',
+  path: '/guest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const E2eRoute = E2eRouteImport.update({
@@ -60,6 +73,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuestThanksRoute = GuestThanksRouteImport.update({
+  id: '/thanks',
+  path: '/thanks',
+  getParentRoute: () => GuestRoute,
+} as any)
 const EntriesNewRoute = EntriesNewRouteImport.update({
   id: '/entries/new',
   path: '/entries/new',
@@ -76,24 +94,30 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
+  '/guest': typeof GuestRouteWithChildren
   '/home': typeof HomeRoute
   '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
+  '/requests': typeof RequestsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
   '/entries/new': typeof EntriesNewRoute
+  '/guest/thanks': typeof GuestThanksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
+  '/guest': typeof GuestRouteWithChildren
   '/home': typeof HomeRoute
   '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
+  '/requests': typeof RequestsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
   '/entries/new': typeof EntriesNewRoute
+  '/guest/thanks': typeof GuestThanksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,12 +125,15 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/coverage': typeof CoverageRoute
   '/e2e': typeof E2eRoute
+  '/guest': typeof GuestRouteWithChildren
   '/home': typeof HomeRoute
   '/import-paper': typeof ImportPaperRoute
   '/logs': typeof LogsRoute
+  '/requests': typeof RequestsRoute
   '/settings': typeof SettingsRoute
   '/entries/$id': typeof EntriesIdRoute
   '/entries/new': typeof EntriesNewRoute
+  '/guest/thanks': typeof GuestThanksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,36 +142,45 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/coverage'
     | '/e2e'
+    | '/guest'
     | '/home'
     | '/import-paper'
     | '/logs'
+    | '/requests'
     | '/settings'
     | '/entries/$id'
     | '/entries/new'
+    | '/guest/thanks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/contacts'
     | '/coverage'
     | '/e2e'
+    | '/guest'
     | '/home'
     | '/import-paper'
     | '/logs'
+    | '/requests'
     | '/settings'
     | '/entries/$id'
     | '/entries/new'
+    | '/guest/thanks'
   id:
     | '__root__'
     | '/'
     | '/contacts'
     | '/coverage'
     | '/e2e'
+    | '/guest'
     | '/home'
     | '/import-paper'
     | '/logs'
+    | '/requests'
     | '/settings'
     | '/entries/$id'
     | '/entries/new'
+    | '/guest/thanks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,9 +188,11 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   CoverageRoute: typeof CoverageRoute
   E2eRoute: typeof E2eRoute
+  GuestRoute: typeof GuestRouteWithChildren
   HomeRoute: typeof HomeRoute
   ImportPaperRoute: typeof ImportPaperRoute
   LogsRoute: typeof LogsRoute
+  RequestsRoute: typeof RequestsRoute
   SettingsRoute: typeof SettingsRoute
   EntriesIdRoute: typeof EntriesIdRoute
   EntriesNewRoute: typeof EntriesNewRoute
@@ -167,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logs': {
@@ -188,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guest': {
+      id: '/guest'
+      path: '/guest'
+      fullPath: '/guest'
+      preLoaderRoute: typeof GuestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/e2e': {
@@ -218,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guest/thanks': {
+      id: '/guest/thanks'
+      path: '/thanks'
+      fullPath: '/guest/thanks'
+      preLoaderRoute: typeof GuestThanksRouteImport
+      parentRoute: typeof GuestRoute
+    }
     '/entries/new': {
       id: '/entries/new'
       path: '/entries/new'
@@ -235,14 +294,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface GuestRouteChildren {
+  GuestThanksRoute: typeof GuestThanksRoute
+}
+
+const GuestRouteChildren: GuestRouteChildren = {
+  GuestThanksRoute: GuestThanksRoute,
+}
+
+const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRoute,
   CoverageRoute: CoverageRoute,
   E2eRoute: E2eRoute,
+  GuestRoute: GuestRouteWithChildren,
   HomeRoute: HomeRoute,
   ImportPaperRoute: ImportPaperRoute,
   LogsRoute: LogsRoute,
+  RequestsRoute: RequestsRoute,
   SettingsRoute: SettingsRoute,
   EntriesIdRoute: EntriesIdRoute,
   EntriesNewRoute: EntriesNewRoute,
