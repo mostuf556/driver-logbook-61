@@ -222,10 +222,11 @@ function GuestPage() {
               </ul>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  type="submit"
+                  type="button"
                   size="sm"
                   variant="outline"
                   className="border-amber-400/50 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-950/50"
+                  onClick={doSubmit}
                 >
                   {t("guestSubmitAnyway", lang)}
                 </Button>
