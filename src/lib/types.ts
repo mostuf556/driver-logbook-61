@@ -146,4 +146,21 @@ export interface AppSettings {
 
   // Debug
   showDebugToggle: boolean;
+
+  // Guard/guest flow
+  requirePassword: boolean;
+  guestSubmitCooldownSeconds: number;
+  guestPageBaseUrl: string;
+}
+
+export interface PendingRequest {
+  id: string;
+  firstName: string;
+  lastName: string;
+  idNumber: string;
+  phone: string;
+  carNumber: string;
+  company: string;
+  requestedAt: string; // ISO
+  note?: string;
 }

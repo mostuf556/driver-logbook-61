@@ -1,14 +1,17 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Bug, ExternalLink, Globe, KeyRound, Loader2, Menu, X } from "lucide-react";
+import { Bug, ExternalLink, Globe, KeyRound, Loader2, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { AuthGate } from "@/components/AuthGate";
 import { useAppData } from "@/hooks/use-app-data";
 import { useDebugMode, setDebugFlag } from "@/hooks/use-debug-mode";
 import { useOpenRouterKeyStatus } from "@/hooks/use-openrouter-key-status";
 import { useTheme } from "@/hooks/use-theme";
+import { hasPassword, isUnlocked, lock } from "@/lib/auth";
+import { loadPendingRequests } from "@/lib/requests";
 import { installErrorListeners } from "@/lib/error-log";
 import { t } from "@/lib/i18n";
 import type { KeyStatusInfo } from "@/hooks/use-openrouter-key-status";
@@ -41,8 +44,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const keyInfo = useOpenRouterKeyStatus(settings);
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [showLock, setShowLock] = useState(false);
   const navItems = [
     { to: "/home", label: t("navEntries", settings.language) },
+    { to: "/requests", label: t("navRequests", settings.language) },
     { to: "/contacts", label: t("navContacts", settings.language) },
     { to: "/logs", label: t("navLogs", settings.language) },
     { to: "/settings", label: t("navSettings", settings.language) },
@@ -51,6 +57,22 @@ export function AppLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     installErrorListeners();
   }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      setPendingCount(loadPendingRequests().length);
+      setShowLock(hasPassword() && isUnlocked() && settings.requirePassword);
+    };
+    sync();
+    window.addEventListener("pending-requests-change", sync);
+    window.addEventListener("auth-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("pending-requests-change", sync);
+      window.removeEventListener("auth-change", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, [settings.requirePassword]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -71,6 +93,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, [navigate]);
 
   return (
+    <AuthGate settings={settings}>
     <div className="min-h-screen bg-background text-foreground" dir={settings.direction}>
       <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-4">
@@ -88,7 +111,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-0.5 text-sm">
             {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to}>
+              <NavLink key={item.to} to={item.to} badge={item.to === "/requests" ? pendingCount : 0}>
                 {item.label}
               </NavLink>
             ))}
@@ -148,6 +171,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
             )}
             <div className="ms-1 border-r h-5 border-border" />
             <ThemeSwitcher />
+            {showLock && (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={t("lock", settings.language)}
+                className="ms-1"
+                onClick={() => {
+                  lock();
+                }}
+              >
+                <LogOut />
+              </Button>
+            )}
           </nav>
 
           {/* Mobile: theme + hamburger */}
@@ -225,10 +261,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <main className="container mx-auto px-4 py-6">{children}</main>
       <Toaster position="top-center" richColors />
     </div>
+    </AuthGate>
   );
 }
 
-function NavLink({ to, children }: { to: string; children: ReactNode }) {
+function NavLink({ to, children, badge = 0 }: { to: string; children: ReactNode; badge?: number }) {
   const location = useLocation();
   const isActive = location.pathname === to || location.pathname.startsWith(to + "/");
 
@@ -236,13 +273,18 @@ function NavLink({ to, children }: { to: string; children: ReactNode }) {
     <Link
       to={to}
       className={[
-        "relative rounded-md px-3 py-1.5 font-medium transition-colors",
+        "relative rounded-md px-3 py-1.5 font-medium transition-colors inline-flex items-center gap-1.5",
         isActive
           ? "text-foreground bg-accent"
           : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
       ].join(" ")}
     >
       {children}
+      {badge > 0 && (
+        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+          {badge}
+        </span>
+      )}
       {isActive && (
         <span className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-[3px] h-0.5 w-4 rounded-full bg-primary" />
       )}
