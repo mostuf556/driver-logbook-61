@@ -46,7 +46,7 @@ function GuestPage() {
     requestedAt: new Date().toISOString(),
     date: todayISO(),
     entryTime: nowHHMM(settings.roundTimesToMinutes),
-    exitTime: null,
+    estimatedExitTime: null,
     approverName: settings.defaultApprover,
     guardName: settings.defaultGuard,
   });
@@ -215,13 +215,13 @@ function GuestPage() {
             />
           </div>
 
-          {/* Exit time */}
+          {/* Estimated exit time */}
           <div className="space-y-1.5">
-            <Label>{t("exitTime", lang)}</Label>
+            <Label>{t("estimatedExitTime", lang)}</Label>
             <Input
               type="time"
-              value={form.exitTime ?? ""}
-              onChange={(e) => set("exitTime", e.target.value || null)}
+              value={form.estimatedExitTime ?? ""}
+              onChange={(e) => set("estimatedExitTime", e.target.value || null)}
             />
           </div>
 

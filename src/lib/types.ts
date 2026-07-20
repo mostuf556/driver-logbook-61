@@ -166,7 +166,7 @@ export interface PendingRequest {
   // Additional fields matching the new-entry form
   date?: string; // YYYY-MM-DD
   entryTime?: string; // HH:mm
-  exitTime?: string | null;
+  estimatedExitTime?: string | null;
   approverName?: string;
   guardName?: string;
 }
