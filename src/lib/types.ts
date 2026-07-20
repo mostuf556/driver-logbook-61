@@ -163,4 +163,10 @@ export interface PendingRequest {
   company: string;
   requestedAt: string; // ISO
   note?: string;
+  // Additional fields matching the new-entry form
+  date?: string; // YYYY-MM-DD
+  entryTime?: string; // HH:mm
+  exitTime?: string | null;
+  approverName?: string;
+  guardName?: string;
 }
