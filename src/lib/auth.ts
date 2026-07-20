@@ -25,6 +25,13 @@ export async function setPassword(pw: string): Promise<void> {
   window.dispatchEvent(new Event("auth-change"));
 }
 
+/** Store the hash without granting a session unlock (used for seeding defaults). */
+export async function seedPassword(pw: string): Promise<void> {
+  const hash = await hashPassword(pw);
+  window.localStorage.setItem(PW_HASH_KEY, hash);
+  // intentionally does NOT set UNLOCK_KEY
+}
+
 export function clearPassword(): void {
   window.localStorage.removeItem(PW_HASH_KEY);
   window.sessionStorage.removeItem(UNLOCK_KEY);

@@ -3,9 +3,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { hasPassword, isUnlocked, setPassword, unlock } from "@/lib/auth";
+import { hasPassword, isUnlocked, seedPassword, setPassword, unlock } from "@/lib/auth";
 import { t } from "@/lib/i18n";
 import type { AppSettings } from "@/lib/types";
+
+const DEFAULT_PASSWORD = "1234abcd";
 
 export function AuthGate({
   settings,
@@ -16,16 +18,21 @@ export function AuthGate({
 }) {
   const [ready, setReady] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
-  const [pwSet, setPwSet] = useState(false);
   const lang = settings.language;
 
   useEffect(() => {
     const sync = () => {
-      setPwSet(hasPassword());
       setUnlocked(isUnlocked());
     };
-    sync();
-    setReady(true);
+    const init = async () => {
+      // Seed the default password on first use so the gate is always enforced
+      if (!hasPassword()) {
+        await seedPassword(DEFAULT_PASSWORD);
+      }
+      sync();
+      setReady(true);
+    };
+    init();
     window.addEventListener("auth-change", sync);
     window.addEventListener("storage", sync);
     return () => {
@@ -38,8 +45,6 @@ export function AuthGate({
 
   // Gate disabled by config → pass through
   if (!settings.requirePassword) return <>{children}</>;
-  // No password set → let user in, they'll be prompted in Settings
-  if (!pwSet) return <>{children}</>;
   if (unlocked) return <>{children}</>;
 
   return <LoginScreen lang={lang} />;
