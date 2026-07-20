@@ -116,4 +116,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   storageNamespace: "driver-report",
 
   showDebugToggle: true,
+
+  requirePassword: true,
+  guestSubmitCooldownSeconds: 30,
+  guestPageBaseUrl: "",
 };
