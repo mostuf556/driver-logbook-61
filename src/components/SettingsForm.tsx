@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppData } from "@/hooks/use-app-data";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { clearAll, exportAllJson, importAllJson } from "@/lib/storage";
+import { clearPassword, hasPassword, setPassword } from "@/lib/auth";
 import {
   checkOpenRouterKeyAvailability,
   clearTokenLog,
@@ -315,6 +316,33 @@ export function SettingsForm() {
               checked={s.showDebugToggle}
               onCheckedChange={(v) => set("showDebugToggle", v)}
             />
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="guest-security">
+          <AccordionTrigger>{t("settingsGuestSection", lang)}</AccordionTrigger>
+          <AccordionContent className="grid gap-4 sm:grid-cols-2">
+            <Toggle
+              label={t("requirePasswordSetting", lang)}
+              checked={s.requirePassword}
+              onCheckedChange={(v) => set("requirePassword", v)}
+            />
+            <NumField
+              label={t("guestCooldownSetting", lang)}
+              value={s.guestSubmitCooldownSeconds}
+              onChange={(n) => set("guestSubmitCooldownSeconds", n)}
+            />
+            <Field label={t("guestPageBaseUrlSetting", lang)} className="sm:col-span-2">
+              <Input
+                value={s.guestPageBaseUrl}
+                onChange={(e) => set("guestPageBaseUrl", e.target.value)}
+                placeholder="https://smart-driver-daily.lovable.app"
+                dir="ltr"
+              />
+            </Field>
+            <div className="sm:col-span-2">
+              <PasswordManager lang={lang} />
+            </div>
           </AccordionContent>
         </AccordionItem>
 
