@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import { AppLayout } from "@/components/AppLayout";
 import { EntriesTable } from "@/components/EntriesTable";
+import { ShareGuestDialog } from "@/components/ShareGuestDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { t } from "@/lib/i18n";
@@ -173,6 +174,7 @@ function HomePage() {
               <Button asChild variant="outline">
                 <Link to="/import-paper">{t("importPaper", lang)}</Link>
               </Button>
+              <ShareGuestDialog settings={settings} />
               <Button asChild>
                 <Link to="/entries/new">{t("addNewEntry", lang)}</Link>
               </Button>
