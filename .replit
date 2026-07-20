@@ -38,3 +38,8 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["node", ".output/server/index.mjs"]
 build = ["npm", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+ALLOWED_ORIGINS = "https://smart-driver-daily.lovable.app"
