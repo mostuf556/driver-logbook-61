@@ -12,6 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Use node-server preset so `npm run build` produces a real Node.js HTTP server
+  // instead of a Cloudflare Worker module (the Lovable sandbox default).
+  // Replit runs the output with `node .output/server/index.mjs`.
+  nitro: { preset: "node-server" },
   vite: {
     server: {
       host: "0.0.0.0",
