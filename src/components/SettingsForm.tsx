@@ -1048,3 +1048,58 @@ function Toggle({
     </div>
   );
 }
+
+function PasswordManager({ lang }: { lang: "he" | "en" }) {
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [hasPw, setHasPw] = useState(false);
+  useEffect(() => {
+    const sync = () => setHasPw(hasPassword());
+    sync();
+    window.addEventListener("auth-change", sync);
+    return () => window.removeEventListener("auth-change", sync);
+  }, []);
+  const save = async () => {
+    if (pw.length < 3) {
+      toast.error(t("password", lang));
+      return;
+    }
+    if (pw !== pw2) {
+      toast.error(t("passwordsDontMatch", lang));
+      return;
+    }
+    await setPassword(pw);
+    setPw("");
+    setPw2("");
+    toast.success(t("passwordSaved", lang));
+  };
+  const remove = () => {
+    clearPassword();
+    toast.success(t("passwordCleared", lang));
+  };
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 rounded border p-3">
+      <div className="sm:col-span-2 text-sm font-medium">
+        {hasPw ? t("changePassword", lang) : t("setPassword", lang)}
+      </div>
+      <div className="space-y-1.5">
+        <Label>{t("password", lang)}</Label>
+        <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <Label>{t("passwordConfirm", lang)}</Label>
+        <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
+      </div>
+      <div className="sm:col-span-2 flex gap-2">
+        <Button type="button" onClick={save}>
+          {t("save", lang)}
+        </Button>
+        {hasPw && (
+          <Button type="button" variant="outline" onClick={remove}>
+            {t("clearPasswordBtn", lang)}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
