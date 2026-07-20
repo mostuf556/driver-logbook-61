@@ -99,6 +99,12 @@ function GuestPage() {
     }
   };
 
+  const doSubmit = () => {
+    setErrors([]);
+    addPendingRequest({ ...form, requestedAt: new Date().toISOString() });
+    navigate({ to: "/guest/thanks" });
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (cooldown > 0) {
@@ -122,9 +128,7 @@ function GuestPage() {
       return;
     }
 
-    setErrors([]);
-    addPendingRequest({ ...form, requestedAt: new Date().toISOString() });
-    navigate({ to: "/guest/thanks" });
+    doSubmit();
   };
 
   return (
@@ -257,16 +261,26 @@ function GuestPage() {
                   </li>
                 ))}
               </ul>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2 border-destructive/40 text-destructive hover:bg-destructive/10"
-                onClick={handleCopyError}
-              >
-                <ClipboardCopy className="h-3.5 w-3.5" />
-                {copied ? t("guestCopied", lang) : t("guestCopyError", lang)}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-destructive/40 text-destructive hover:bg-destructive/10"
+                  onClick={handleCopyError}
+                >
+                  <ClipboardCopy className="h-3.5 w-3.5" />
+                  {copied ? t("guestCopied", lang) : t("guestCopyError", lang)}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  onClick={doSubmit}
+                >
+                  {t("guestSubmitAnyway", lang)}
+                </Button>
+              </div>
             </div>
           )}
 
