@@ -44,7 +44,7 @@ function RequestsPage() {
       phone: req.phone,
       carNumber: req.carNumber,
       entryTime: nowHHMM(settings.roundTimesToMinutes),
-      exitTime: req.estimatedExitTime ?? null,
+      exitTime: null,
       approverName: settings.defaultApprover,
       company: req.company,
       guardName: settings.defaultGuard,
