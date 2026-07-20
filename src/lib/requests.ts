@@ -1,3 +1,4 @@
+import { logEvent } from "./error-log";
 import type { PendingRequest } from "./types";
 
 const KEY = "pending_requests";
@@ -33,6 +34,12 @@ export function addPendingRequest(req: PendingRequest): void {
   const list = loadPendingRequests();
   savePendingRequests([req, ...list]);
   window.localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+  const name = [req.firstName, req.lastName].filter(Boolean).join(" ") || "—";
+  logEvent(
+    "guest-request",
+    `New entrance request: ${name}${req.carNumber ? ` · ${req.carNumber}` : ""}${req.company ? ` (${req.company})` : ""}`,
+    "/guest",
+  );
 }
 
 export function removePendingRequest(id: string): void {

@@ -86,7 +86,7 @@ function RequestsPage() {
                   key={r.id}
                   className="flex flex-wrap items-center justify-between gap-3 rounded border bg-card p-3"
                 >
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0 flex-1">
                     <div className="font-medium">
                       {fullName || "—"}{" "}
                       {r.company && (
@@ -94,10 +94,26 @@ function RequestsPage() {
                       )}
                     </div>
                     <div className="text-sm text-muted-foreground flex flex-wrap gap-x-3">
-                      <span dir="ltr" className="font-mono">{r.carNumber || "—"}</span>
-                      <span>{r.idNumber}</span>
-                      <span dir="ltr">{r.phone}</span>
-                      <span>{new Date(r.requestedAt).toLocaleString()}</span>
+                      {r.carNumber && <span dir="ltr" className="font-mono">{r.carNumber}</span>}
+                      {r.idNumber && <span>{r.idNumber}</span>}
+                      {r.phone && <span dir="ltr">{r.phone}</span>}
+                    </div>
+                    <div className="text-sm text-muted-foreground flex flex-wrap gap-x-3">
+                      {r.date && <span>{t("date", lang)}: {r.date}</span>}
+                      {r.entryTime && <span>{t("entryTime", lang)}: {r.entryTime}</span>}
+                      {r.estimatedExitTime && (
+                        <span>{t("estimatedExitTime", lang)}: {r.estimatedExitTime}</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground flex flex-wrap gap-x-3">
+                      {r.approverName && <span>{t("approverName", lang)}: {r.approverName}</span>}
+                      {r.guardName && <span>{t("guardName", lang)}: {r.guardName}</span>}
+                    </div>
+                    {r.note && (
+                      <div className="text-sm text-muted-foreground">{r.note}</div>
+                    )}
+                    <div className="text-xs text-muted-foreground/70">
+                      {new Date(r.requestedAt).toLocaleString()}
                     </div>
                   </div>
                   <div className="flex gap-2">
