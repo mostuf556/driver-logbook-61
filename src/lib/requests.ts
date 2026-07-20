@@ -1,39 +1,25 @@
 import { logEvent } from "./error-log";
+import {
+  addPendingRequestFn,
+  listPendingRequestsFn,
+  removePendingRequestFn,
+} from "./api/requests.functions";
 import type { PendingRequest } from "./types";
 
-const KEY = "pending_requests";
-const NS_KEY = "driver-report:namespace";
-const COOLDOWN_KEY = "driver-report:guest-last-submit";
-
-function ns(): string {
-  if (typeof window === "undefined") return "driver-report";
-  return window.localStorage.getItem(NS_KEY) || "driver-report";
-}
-
-function k(): string {
-  return `${ns()}:${KEY}`;
-}
-
-export function loadPendingRequests(): PendingRequest[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(k());
-    return raw ? (JSON.parse(raw) as PendingRequest[]) : [];
-  } catch {
-    return [];
+/** Notify all in-page listeners that the list changed. */
+function notifyChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("pending-requests-change"));
   }
 }
 
-export function savePendingRequests(list: PendingRequest[]): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(k(), JSON.stringify(list));
-  window.dispatchEvent(new Event("pending-requests-change"));
+export async function loadPendingRequests(): Promise<PendingRequest[]> {
+  return listPendingRequestsFn();
 }
 
-export function addPendingRequest(req: PendingRequest): void {
-  const list = loadPendingRequests();
-  savePendingRequests([req, ...list]);
-  window.localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+export async function addPendingRequest(req: PendingRequest): Promise<void> {
+  await addPendingRequestFn({ data: req });
+  notifyChange();
   const name = [req.firstName, req.lastName].filter(Boolean).join(" ") || "—";
   logEvent(
     "guest-request",
@@ -42,14 +28,7 @@ export function addPendingRequest(req: PendingRequest): void {
   );
 }
 
-export function removePendingRequest(id: string): void {
-  savePendingRequests(loadPendingRequests().filter((r) => r.id !== id));
-}
-
-export function guestCooldownRemaining(cooldownSeconds: number): number {
-  if (typeof window === "undefined") return 0;
-  const last = Number(window.localStorage.getItem(COOLDOWN_KEY) || 0);
-  if (!last) return 0;
-  const elapsed = (Date.now() - last) / 1000;
-  return Math.max(0, Math.ceil(cooldownSeconds - elapsed));
+export async function removePendingRequest(id: string): Promise<void> {
+  await removePendingRequestFn({ data: { id } });
+  notifyChange();
 }

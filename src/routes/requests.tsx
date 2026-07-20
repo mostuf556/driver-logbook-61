@@ -24,17 +24,17 @@ function RequestsPage() {
   const [pending, setPending] = useState<PendingRequest[]>([]);
 
   useEffect(() => {
-    const sync = () => setPending(loadPendingRequests());
+    const sync = () => {
+      loadPendingRequests().then(setPending).catch(() => setPending([]));
+    };
     sync();
     window.addEventListener("pending-requests-change", sync);
-    window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("pending-requests-change", sync);
-      window.removeEventListener("storage", sync);
     };
   }, []);
 
-  const approve = (req: PendingRequest) => {
+  const approve = async (req: PendingRequest) => {
     const next: DriverReport = {
       id: uid(),
       date: todayISO(),
@@ -53,12 +53,12 @@ function RequestsPage() {
     };
     updateReports([next, ...reports]);
     updateContacts(upsertContactFromReport(contacts, next, settings));
-    removePendingRequest(req.id);
+    await removePendingRequest(req.id);
     toast.success(t("requestApproved", lang));
   };
 
-  const reject = (req: PendingRequest) => {
-    removePendingRequest(req.id);
+  const reject = async (req: PendingRequest) => {
+    await removePendingRequest(req.id);
     toast.success(t("requestRejected", lang));
   };
 

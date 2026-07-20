@@ -89,14 +89,19 @@ function GuestPage() {
     }
   };
 
-  const doSubmit = () => {
-    addPendingRequest({
-      ...form,
-      date: todayISO(),
-      entryTime: nowHHMM(settings.roundTimesToMinutes),
-      requestedAt: new Date().toISOString(),
-    });
-    setSubmitted(true);
+  const doSubmit = async () => {
+    try {
+      await addPendingRequest({
+        ...form,
+        date: todayISO(),
+        entryTime: nowHHMM(settings.roundTimesToMinutes),
+        requestedAt: new Date().toISOString(),
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Failed to submit guest request", err);
+      setWarnings(["שגיאה בשמירת הבקשה. נסה שוב."]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -113,7 +118,7 @@ function GuestPage() {
       return;
     }
 
-    doSubmit();
+    void doSubmit();
   };
 
   const handleAnother = () => {

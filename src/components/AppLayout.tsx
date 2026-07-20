@@ -60,17 +60,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const sync = () => {
-      setPendingCount(loadPendingRequests().length);
+      loadPendingRequests().then((list) => setPendingCount(list.length)).catch(() => {});
       setShowLock(hasPassword() && isUnlocked() && settings.requirePassword);
     };
     sync();
     window.addEventListener("pending-requests-change", sync);
     window.addEventListener("auth-change", sync);
-    window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("pending-requests-change", sync);
       window.removeEventListener("auth-change", sync);
-      window.removeEventListener("storage", sync);
     };
   }, [settings.requirePassword]);
 
